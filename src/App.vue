@@ -7,13 +7,16 @@
 </template>
 
 <script>
+import NewDeviceType from "@/components/DeviceType/NewDeviceType";
 import Home from "@/views/Home";
 import NewDevice from "@/components/NewDevice/NewDevice";
 export default {
   name: "App",
   components: {
+    NewDeviceType
     Home,
     NewDevice
+
   },
   data() {
     return {
