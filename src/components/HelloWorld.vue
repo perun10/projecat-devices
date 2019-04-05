@@ -22,8 +22,8 @@
           <br>please join our online
           <a href="https://community.vuetifyjs.com" target="_blank">Discord Community</a>
         </p>
-        <v-treeview :items="devices" :selectable='true' v-model="value" :open-all="true" item-children='items'></v-treeview>
-        <p v-if="value">{{value}}</p>
+        <v-treeview :items="devices"  v-model="value" :open-all="true" item-children='items'></v-treeview>
+        <p v-if="value">{{value}}</p>wwww
       </v-flex>
       <v-flex>        
       </v-flex>
@@ -36,47 +36,78 @@
     data(){
       return{
         value:[],
-        devices:[{
-          id:1,
-          name:'Proba',
-          description:'Opis',
-          properties:[{propertyName:'cpu',required:true,type:'Text'}],
-          propetyId:null,
-          items:[{
-            id:2,
-            name:'Proba 1',
-            description:'Opis',
-            properties:[{propertyName:'ram',required:true,type:'Text'}],
-            propetyId:1,
-            items:[
-              {
-              id:3,
-              name:'Proba 1.1',
-              description:'Opis',
-              properties:[{propertyName:'display',required:true,type:'Text'}],
-              propetyId:2,
+        devices:[
+        {
+          id: 1,
+          name: "RACUNAR",
+          parentid: null,
+          description: "OPIS",
+          properties: [
+            {
+              nameProperty: "cpu",
+              required: true,
+              type: "Text"
             },
-              {
-              id:4,
-              name:'Proba 1.2',
-              description:'Opis',
-              properties:[{propertyName:'tastatura',required:true,type:'Text'}],
-              propetyId:2,
+            {
+              nameProperty: "ram",
+              required: false,
+              type: "Text"
             }
-            ]
-          },
-          {
-            id:5,
-            name:'Proba 2',
-            description:'Opis',
-            properties:[{propertyName:'mis',required:true,type:'Text'}],
-            propetyId:1,
-
-          }
-          
-          
+          ],
+          items: [{
+          id: 2,
+          name: "LAPTOP",
+          parentid: 1,
+          description: "OPIS",
+          properties: [
+            {
+              nameProperty: "touchpad",
+              required: false,
+              type: "Text"
+            }],
+          items: [
+            {
+              id: 3,
+              name: "ULTRA - LAPTOP",
+              parentid: 2,
+              description: "ULTRA LAGAN",
+              properties: [
+                {
+                  nameProperty: "weight",
+                  required: true,
+                  type: "Text"
+                }
+              ],
+            items: [{
+              id:4,
+              name:"Mob"
+            }]
+            },
+            {
+              id:7,
+              name:"Standard Laptop",
+              parentid:2,
+              description:"Standardni laptop",
+              properties:[{
+                nameProperty:"price",
+                required:true,
+                type:'Text'
+              }]
+            }
           ]
-        }]
+        },
+        {
+          id:5,
+          name: "Desktop"
+        }
+        ,
+        {
+          id:6,
+          name: "Server"
+        }
+          ]
+        }
+      ]
       }
     }
   }
