@@ -2,7 +2,7 @@ import Vue from "vue";
 import Router from "vue-router";
 import Home from "./views/Home.vue";
 import NewDeviceType from "@/components/DeviceType/NewDeviceType.vue";
-
+import NewDevice from "@/components/NewDevice/NewDevice.vue"
 Vue.use(Router);
 
 export default new Router({
@@ -15,9 +15,18 @@ export default new Router({
       component: Home
     },
     {
+
       path: "device-type",
       name: "device-type",
       component: NewDeviceType
+      
+    },
+    {
+      path:"/device",
+      name:"new-device",
+      component:NewDevice
+
     }
+    
   ]
 });
