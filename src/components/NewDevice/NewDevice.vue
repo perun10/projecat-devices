@@ -42,31 +42,32 @@
       </v-container>
     </v-tab-item>
     <v-tab-item v-if="selectedValue!=0">
-          <h1 class="text-center">New device</h1>
-
+          <h1 class="text-center mt-3">New device</h1>
+    
       <v-container>
-        <v-layout row wrap>
+        <v-layout row wrap> 
           <v-flex xs12>
             <template>
-              <div class="col-8">
-               <div v-for="(item, index) in items2" :key="index" class="property">
-                   <p class="propertyHeader">"{{ item.name }}" properties</p>
-                   <p class="propertyDescription">{{ item.description }}</p>
+              
+                <v-expansion-panel class="p-3">
+    <v-expansion-panel-content 
+      v-for="(item, index) in items2" :key="index">
+      <template v-slot:header>
+        <div>{{item.name}} properties</div>                  
+      </template>
+      <v-card>
+        <v-card-text>
+           <p class="propertyDescription">{{ item.description }}</p>
                    <div v-for="(item, index) in item.properties" :key="index">
                        <div class="propertyBody">
                            <p>{{ item.nameProperty }} <span v-if="item.required" class="required">*</span></p>
                            <input type="text">
                        </div>
                    </div>
-               </div>
-           </div>
-              <!-- <v-data-table :headers="header" :items="devices" class="elevation-1">
-                <template v-slot:items="props">
-                  <td>{{props.item.name}}</td>
-                  <td class="text-xs-center">{{props.item.deviceType}}</td>
-                  <td class="text-xs-right">{{props.item.description}}</td>
-                </template>
-              </v-data-table> -->
+        </v-card-text>
+      </v-card>
+    </v-expansion-panel-content>
+  </v-expansion-panel>          
             </template>
           </v-flex>
         </v-layout>
@@ -237,6 +238,53 @@ data(){
 }
 </script>
 
-<style>
+<style scoped>
+input {
+       border: 1px solid #404040;
+       margin-bottom: 15px;
+       width: 319px;
+       height: 32px;
+       padding-left: 6px;
+   }
 
+   .property {
+       max-width: 747px;
+       margin: 0 auto;
+       border: 1px solid #404040;
+       margin-bottom: 25px;
+   }
+
+   .propertyHeader {
+       height: 40px;
+       background-color: #efefef;
+       font-weight: 700;
+       padding-left: 25px;
+       vertical-align: middle;
+       line-height: 40px;
+       border-bottom: 1px solid #404040;
+   }
+
+   .propertyBody {
+       margin-left: 25px;
+       display: inline-block;
+   }
+
+   .required {
+       color: red;
+   }
+
+   .propertyDescription {
+       margin-left: 25px;
+   }
+
+   button {
+       width: 141px;
+       height: 34px;
+       border: 1px solid #4A86E8;
+       margin-right: 40px;
+   }
+.btn-save {
+       background-color: #4a86e8;
+       color: white;
+   }
 </style>
