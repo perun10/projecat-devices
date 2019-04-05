@@ -1,18 +1,12 @@
 <template>
-  <v-tabs v-model="active" color="grey" dark slider-color="yellow" :centered="true">
-    <v-tab>Device Types</v-tab>
-    <v-tab>Devices</v-tab>
+     
+    <v-tabs v-model="active" color="grey" dark slider-color="yellow" :centered="true">
+    <v-tab>Step 1 | Device Type</v-tab>
+    <v-tab>Step 2 | Properties</v-tab>
     <v-tab-item>
-      <v-container>
-        <v-layout row wrap>
-          <v-flex xs12 mb-5>
-            <button
-              type="button"
-              class="btn btn-primary"
-              @click="pushToNewDeviceType"
-            >New device type</button>
-          </v-flex>
-        </v-layout>
+    <h1 class="text-center">New device</h1>
+
+      <v-container>       
         <v-layout row wrap>
           <v-flex xs12>
             <v-layout :justify-space-between="true">
@@ -21,39 +15,58 @@
             </v-layout>
             <v-treeview
               :items="items"
-              v-model="value"
+              :selectable="true"
+              v-model="selectedValue"
+              :value="selectedValue"
               :open-all="true"
               style="border:1px solid black;"
               class="border"
             >
               <template v-slot:append="{item , active}" class="text-center">
                 <p class="mr-3 mt-3">{{item.description}}</p>
-                <button type="button" class="btn btn-link" v-if="item.id!=1">Delete</button>
-                <button type="button" class="btn btn-link">Edit</button>
+                <!-- <button type="button" class="btn btn-link" v-if="item.id!=1">Delete</button> -->
+                <!-- <button type="button" class="btn btn-link">Edit</button> -->
               </template>
             </v-treeview>
+            {{selectedValue}}
+            <v-layout row wrap :justify-space-around="true">
+             
+                <button type="button" class="btn btn-light" @click="close">Cancel</button>
+                <button type="button" class="btn btn-primary" @click="next">Next</button>
+             
+            </v-layout>
           </v-flex>
           <v-flex></v-flex>
         </v-layout>
+        
       </v-container>
     </v-tab-item>
-    <v-tab-item>
+    <v-tab-item v-if="selectedValue!=0">
+          <h1 class="text-center">New device</h1>
+
       <v-container>
-        <v-layout row wrap>
-          <v-flex xs12 mb-5>
-            <button type="button" class="btn btn-primary" @click="pushToNewDevice">New device</button>
-          </v-flex>
-        </v-layout>
         <v-layout row wrap>
           <v-flex xs12>
             <template>
-              <v-data-table :headers="header" :items="devices" class="elevation-1">
+              <div class="col-8">
+               <div v-for="(item, index) in items2" :key="index" class="property">
+                   <p class="propertyHeader">"{{ item.name }}" properties</p>
+                   <p class="propertyDescription">{{ item.description }}</p>
+                   <div v-for="(item, index) in item.properties" :key="index">
+                       <div class="propertyBody">
+                           <p>{{ item.nameProperty }} <span v-if="item.required" class="required">*</span></p>
+                           <input type="text">
+                       </div>
+                   </div>
+               </div>
+           </div>
+              <!-- <v-data-table :headers="header" :items="devices" class="elevation-1">
                 <template v-slot:items="props">
                   <td>{{props.item.name}}</td>
                   <td class="text-xs-center">{{props.item.deviceType}}</td>
                   <td class="text-xs-right">{{props.item.description}}</td>
                 </template>
-              </v-data-table>
+              </v-data-table> -->
             </template>
           </v-flex>
         </v-layout>
@@ -61,90 +74,27 @@
     </v-tab-item>
   </v-tabs>
 </template>
-<style>
-.v-treeview-node__root {
-  border: 1px solid grey;
-}
-</style>
 
 <script>
 export default {
-  data() {
-    return {
-      active: "",
-      itemKey: [],
-      value: [],
-      header: [
-        {
-          text: "Name",
-          align: "left",
-          sortable: true,
-          value: "name"
-        },
-        {
-          text: "Type",
-          align: "center",
-          sortable: true,
-          value: "type"
-        },
-        {
-          text: "Description",
-          align: "right",
-          sortable: false,
-          value: "description"
+  methods: {
+      next () {
+        if(this.selectedValue!=0){
+        const active = parseInt(this.active)
+        this.active = (active < 2 ? active + 1 : 0)
+        }else{
+          alert('PICK DEVICE TYPE')
         }
-      ],
-      devices: [
-        {
-          id: 1,
-          name: "Device 1",
-          deviceType: "Racunar",
-          description: "Ovo je device 1"
-        },
-        {
-          id: 2,
-          name: "Device 2",
-          deviceType: "Laptop",
-          description: "Ovo je device 2"
-        },
-        {
-          id: 3,
-          name: "Device 3",
-          deviceType: "Standard Laptop",
-          description: "Ovo je device 3"
-        },
-        {
-          id: 4,
-          name: "Device 4",
-          deviceType: "Desktop",
-          description: "Ovo je device 4"
-        },
-        {
-          id: 5,
-          name: "Device 5",
-          deviceType: "ULTRA - BOOK",
-          description: "Ovo je device 5"
-        },
-        {
-          id: 6,
-          name: "Device 6",
-          deviceType: "Air Book",
-          description: "Ovo je device 6"
-        },
-        {
-          id: 7,
-          name: "Device 7",
-          deviceType: "Laptop",
-          description: "Ovo je device 7"
-        },
-        {
-          id: 8,
-          name: "Device 8",
-          deviceType: "Server",
-          description: "Ovo je device 8"
-        }
-      ],
-      items: [
+      },
+      close(){
+        this.$router.push('/')
+      }
+    },
+data(){
+  return {
+    active:null,
+    selectedValue:[],
+    items: [
         {
           id: 1,
           name: "RACUNAR",
@@ -247,16 +197,46 @@ export default {
             }
           ]
         }
+      ],
+      items2:[
+    {
+      id:1,
+      name:"RACUNAR",
+      parentid:null,
+      description:"OPIS",
+      properties:[
+        {nameProperty:"cpu",required:true,type:"Text"},
+        {nameProperty:"ram",required:false,type:"Text"}
       ]
-    };
-  },
-  methods: {
-    pushToNewDeviceType() {
-      this.$router.push("/device-type");
     },
-    pushToNewDevice() {
-      this.$router.push("/device");
+    {
+      id:2,
+      name:"LAPTOP",
+      parentid:1,
+      description:"OPIS",
+      properties:[{nameProperty:"touchpad",required:false,type:"Text"}]
+    },
+    {
+      id:3,
+      name:"ULTRA - LAPTOP",
+      parentid:2,
+      description:"ULTRA LAGAN",
+      properties:[
+        {nameProperty:"weight",required:true,type:"Text"},
+        {nameProperty:"boja",required:true,type:"zelena"}
+      ]
+    },
+    {
+      id:4,
+      name:"Ultra Book",
+      properties:[{nameProperty:"tezina",required:true,type:"Text"}]
     }
+   ]
   }
-};
+}
+}
 </script>
+
+<style>
+
+</style>
