@@ -19,7 +19,7 @@
 
             <!-- property builder tab -->
             <div v-if="tab === 'builder'">
-                <type-property-builder></type-property-builder>
+                <type-property-builder @clicked="changeTab"></type-property-builder>
             </div>
 
         </div>
@@ -29,6 +29,8 @@
 <script>
 import TypeBasicInfo from '@/components/DeviceType/TypeBasicInfo';
 import TypePropertyBuilder from '@/components/DeviceType/TypePropertyBuilder';
+import {store} from '../../store/store.js'
+
 
 export default {
     components: {
@@ -38,6 +40,11 @@ export default {
     data() {
         return {
             tab: 'builder'
+        }
+    },
+    methods: {
+        changeTab(value) {
+            this.tab = value;
         }
     }
 }
