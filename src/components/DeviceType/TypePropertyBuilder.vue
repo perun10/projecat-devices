@@ -6,8 +6,8 @@
                     v-if="deviceTypes"
                     :device="deviceTypes">
                 </recursive-component>
-                div v-if='create'
-                inpurt
+              
+                
             </div>
             <div class="col-4 border">
                 <p class="row">Fields</p>
