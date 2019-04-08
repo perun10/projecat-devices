@@ -13,7 +13,7 @@ import NewDevice from "@/components/NewDevice/NewDevice";
 export default {
   name: "App",
   components: {
-    NewDeviceType
+    NewDeviceType,
     Home,
     NewDevice
 

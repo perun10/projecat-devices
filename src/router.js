@@ -16,7 +16,7 @@ export default new Router({
     },
     {
 
-      path: "device-type",
+      path: "/device-type",
       name: "device-type",
       component: NewDeviceType
       
