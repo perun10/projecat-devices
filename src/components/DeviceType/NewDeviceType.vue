@@ -39,7 +39,7 @@ export default {
     },
     data() {
         return {
-            tab: 'builder'
+            tab: 'info'
         }
     },
     methods: {

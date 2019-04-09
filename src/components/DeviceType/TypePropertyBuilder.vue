@@ -1,27 +1,40 @@
 <template>
     <div class="container">
-        <div class="row">
-            <div class="col-8">
-                <recursive-component
-                    v-if="deviceTypes"
-                    :device="deviceTypes">
-                </recursive-component>
+       <div class="row">
+           <div class="col-8"  v-if="deviceTypes">
+               <!-- ZA REKURZIJU -->
+               <v-flex col8>
+                   <recursive-component
+                       v-if="deviceTypes"
+                       :device="deviceTypes">
+                   </recursive-component>
+               </v-flex>
               
-                
-            </div>
-            <div class="col-4 border">
-                <p class="row">Fields</p>
-                <p class="row">Drag & drop or click to add</p>
-                <p class="row">Text</p>
-                <p class="row">Text Area</p>
-            </div>
-        </div>
-        <div class="row border justify-content-center buttons">
-            <button @click="cancel">Cancel</button>
-            <button @click="goBack">Back</button>
-            <button class="btn-save">Save</button>
-        </div>
-    </div>
+               <!-- ZA FLAT -->
+               <!-- <div v-for="(item, index) in deviceTypes.children" :key="index" class="property">
+                   <p class="propertyHeader">"{{ item.name }}" properties</p>
+                   <p class="propertyDescription">{{ item.description }}</p>
+                   <div v-for="(item, index) in item.properties" :key="index">
+                       <div class="propertyBody">
+                           <p>{{ item.nameProperty }} <span v-if="item.required" class="required">*</span></p>
+                           <input type="text">
+                       </div>
+                   </div>
+               </div> -->
+           </div>
+           <v-flex col4 class="border">
+               <p class="row">Fields</p>
+               <p class="row">Drag & drop or click to add</p>
+               <p class="row">Text</p>
+               <p class="row">Text Area</p>
+           </v-flex>
+       </div>
+       <div class="row border justify-content-center buttons">
+           <button @click="cancel">Cancel</button>
+           <button @click="goBack">Back</button>
+           <button class="btn-save" >Save</button>
+       </div>
+   </div>
 </template>
 
 <script>
@@ -49,35 +62,40 @@ export default {
     },
     data() {
         return {
-            //  items: []
-                    // {
-                    //     id: 1,
-                    //     name: 'RACUNAR',
-                    //     parentid: null,
-                    //     description: 'RACUNAR PARENT 0',
-                    //     properties: [
-                    //     {
-                    //         nameProperty: 'cpu',
-                    //         required: true,
-                    //         type: 'Text'
-                    //     },
-                    //     {
-                    //         nameProperty: 'ram',
-                    //         required: false,
-                    //         type: 'Text'
-                    //     }
-                    //     ],
-                    //     children: [
-                    //     {
-                    //         id: 2,
-                    //         name: 'LAPTOP',
-                    //         parentid: 1,
-                    //         description: 'Basic Laptop',
-                    //         properties: [
-                    //         {
-                    //             nameProperty: 'touchpad',
-                    //             required: false,
-                    //             type: 'Text'
+//           items:[
+//     {
+//       "id":1,
+//       "name":"RACUNAR",
+//       "parentid":null,
+//       "description":"OPIS",
+//       "properties":[
+//         {"nameProperty":"cpu","required":true,"type":"Text"},
+//         {"nameProperty":"ram","required":false,"type":"Text"}
+//       ]
+//     },
+//     {
+//       "id":2,
+//       "name":"LAPTOP",
+//       "parentid":1,
+//       "description":"OPIS",
+//       "properties":[{"nameProperty":"touchpad","required":false,"type":"Text"}]
+//     },
+//     {
+//       "id":3,
+//       "name":"ULTRA - LAPTOP",
+//       "parentid":2,
+//       "description":"ULTRA LAGAN",
+//       "properties":[
+//         {"nameProperty":"weight","required":true,"type":"Text"},
+//         {"nameProperty":"boja","required":true,"type":"zelena"}
+//       ]
+//     },
+//     {
+//       "id":4,
+//       "name":"Ultra Book",
+//       "properties":[{"nameProperty":"tezina","required":true,"type":"Text"}]
+//     }
+//    ]
                     //         }
                     //         ],
                     //         children: [
@@ -194,6 +212,43 @@ export default {
 
     .buttons {
         height: 77px;
+    }
+ input {
+        border: 1px solid #404040;
+        margin-bottom: 15px;
+        width: 319px;
+        height: 32px;
+        padding-left: 6px;
+    }
+
+    .property {
+        max-width: 747px;
+        margin: 0 auto;
+        border: 1px solid #404040;
+        margin-bottom: 25px;
+    }
+
+    .propertyHeader {
+        height: 40px;
+        background-color: #efefef;
+        font-weight: 700;
+        padding-left: 25px;
+        vertical-align: middle;
+        line-height: 40px;
+        border-bottom: 1px solid #404040;
+    }
+
+    .propertyBody {
+        margin-left: 25px;
+        display: inline-block;
+    }
+
+    .required {
+        color: red;
+    }
+
+    .propertyDescription {
+        margin-left: 25px;
     }
 
 

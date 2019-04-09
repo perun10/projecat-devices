@@ -1,21 +1,34 @@
 import axios from 'axios'
 
 const state = {
-    deviceTypes: null
+    deviceTypes: null,
+    devices:null
 };
 
 const mutations = {
     setDeviceTypes(state, payload) {
         state.deviceTypes = payload;
+    },
+    setDevices(state, payload) {
+        state.devices = payload;
     }
 };
 
 const actions = {
     getDeviceProperties({ commit }) {
-        axios.get('https://test-projekat-nr.firebaseio.com/0.json')
+        axios.get('http://localhost:21021/api/services/app/DeviceService/GetDeviceTypeNestedDtos')
         .then((response) => {
-            let data = response.data;
-            commit('setDeviceTypes', data);
+            let data = response.data.result[0];
+            // console.log(data);            
+          commit('setDeviceTypes', data);
+        })
+    },
+    getDevices({commit}){
+        axios.get('http://localhost:21021/api/services/app/DeviceService/GetAllDevices')
+        .then((response) => {
+            let data = response;
+            // console.log(response);            
+          commit('setDevices', data);
         })
     }
 };
@@ -23,6 +36,9 @@ const actions = {
 const getters = {
     deviceTypes(state) {
         return state.deviceTypes;
+    },
+    devices(state){
+        return state.devices
     }
 };
 

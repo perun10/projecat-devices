@@ -4,7 +4,7 @@
       "name":"RACUNAR",
       "parentid":null,
       "description":"OPIS",
-      "properties":[
+      "items":[
         {"nameProperty":"cpu","required":true,"type":"Text"},
         {"nameProperty":"ram","required":false,"type":"Text"}
       ]
@@ -14,14 +14,14 @@
       "name":"LAPTOP",
       "parentid":1,
       "description":"OPIS",
-      "properties":[{"nameProperty":"touchpad","required":false,"type":"Text"}]
+      "items":[{"nameProperty":"touchpad","required":false,"type":"Text"}]
     },
     {
       "id":3,
       "name":"ULTRA - LAPTOP",
       "parentid":2,
       "description":"ULTRA LAGAN",
-      "properties":[
+      "items":[
         {"nameProperty":"weight","required":true,"type":"Text"},
         {"nameProperty":"boja","required":true,"type":"zelena"}
       ]
@@ -29,6 +29,6 @@
     {
       "id":4,
       "name":"Ultra Book",
-      "properties":[{"nameProperty":"tezina","required":true,"type":"Text"}]
+      "items":[{"nameProperty":"tezina","required":true,"type":"Text"}]
     }
    ]

@@ -20,12 +20,12 @@
               <h3>Description</h3>
             </v-layout>
             <v-treeview
-              :items="items"
+              :items="myData"
               v-model="value"
               :open-all="true"
               style="border:1px solid black;"
               class="border"
-            >
+            v-if="deviceTypes">
               <template v-slot:append="{item , active}" class="text-center">
                 <p class="mr-3 mt-3">{{item.description}}</p>
                 <button type="button" class="btn btn-link" v-if="item.id!=1">Delete</button>
@@ -46,15 +46,19 @@
         </v-layout>
         <v-layout row wrap>
           <v-flex xs12>
-            <template>
-              <v-data-table :headers="header" :items="devices" class="elevation-1">
+        
+              <v-data-table :headers="header" :items="devices" class="elevation-1" v-if="devices">
                 <template v-slot:items="props">
                   <td>{{props.item.name}}</td>
-                  <td class="text-xs-center">{{props.item.deviceType}}</td>
-                  <td class="text-xs-right">{{props.item.description}}</td>
+                  <td class="text-center">{{props.item.deviceType}}</td>
+                  <td class="text-right">{{props.item.description}}</td>
+             
                 </template>
               </v-data-table>
-            </template>
+              <!-- <div v-for="data in deviceTypes" >
+                <p>{{data}}</p>
+              </div> -->
+          
           </v-flex>
         </v-layout>
       </v-container>
@@ -93,170 +97,37 @@ export default {
           sortable: false,
           value: "description"
         }
-      ],
-      devices: [
-        {
-          id: 1,
-          name: "Device 1",
-          deviceType: "Racunar",
-          description: "Ovo je device 1"
-        },
-        {
-          id: 2,
-          name: "Device 2",
-          deviceType: "Laptop",
-          description: "Ovo je device 2"
-        },
-        {
-          id: 3,
-          name: "Device 3",
-          deviceType: "Standard Laptop",
-          description: "Ovo je device 3"
-        },
-        {
-          id: 4,
-          name: "Device 4",
-          deviceType: "Desktop",
-          description: "Ovo je device 4"
-        },
-        {
-          id: 5,
-          name: "Device 5",
-          deviceType: "ULTRA - BOOK",
-          description: "Ovo je device 5"
-        },
-        {
-          id: 6,
-          name: "Device 6",
-          deviceType: "Air Book",
-          description: "Ovo je device 6"
-        },
-        {
-          id: 7,
-          name: "Device 7",
-          deviceType: "Laptop",
-          description: "Ovo je device 7"
-        },
-        {
-          id: 8,
-          name: "Device 8",
-          deviceType: "Server",
-          description: "Ovo je device 8"
-        }
-      ],
-      items: [
-        {
-          id: 1,
-          name: "RACUNAR",
-          parentid: null,
-          description: "RACUNAR PARENT 0",
-          properties: [
-            {
-              nameProperty: "cpu",
-              required: true,
-              type: "Text"
-            },
-            {
-              nameProperty: "ram",
-              required: false,
-              type: "Text"
-            }
-          ],
-          children: [
-            {
-              id: 2,
-              name: "LAPTOP",
-              parentid: 1,
-              description: "Basic Laptop",
-              properties: [
-                {
-                  nameProperty: "touchpad",
-                  required: false,
-                  type: "Text"
-                }
-              ],
-              children: [
-                {
-                  id: 3,
-                  name: "ULTRA - LAPTOP",
-                  parentid: 2,
-                  description: "ULTRA LAGAN",
-                  properties: [
-                    {
-                      nameProperty: "weight",
-                      required: true,
-                      type: "Text"
-                    }
-                  ],
-                  children: [
-                    {
-                      id: 4,
-                      name: "Air Book",
-                      parentid: 3,
-                      description: "Microsoft Air Book",
-                      properties: [
-                        {
-                          nameProperty: "size",
-                          required: true,
-                          type: "input"
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  id: 7,
-                  name: "Standard Laptop",
-                  parentid: 2,
-                  description: "Standardni laptop",
-                  properties: [
-                    {
-                      nameProperty: "price",
-                      required: true,
-                      type: "Text"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              id: 5,
-              name: "Desktop",
-              parentid: 1,
-              description: "Home desktop PC",
-              properties: [
-                {
-                  nameProperty: "Case",
-                  required: true,
-                  type: "Label"
-                }
-              ]
-            },
-            {
-              id: 6,
-              name: "Server",
-              parentid: 1,
-              description: "Server Firewall",
-              properties: [
-                {
-                  nameProperty: "Housing",
-                  required: true,
-                  type: "Label"
-                }
-              ]
-            }
-          ]
-        }
       ]
-    };
+    }
   },
+  beforeCreate() {
+  this.$store.dispatch('getDeviceProperties')
+  // this.$store.dispatch('getDevices')
+    },
+    mounted(){
+      console.log(this.deviceTypes)
+    },
   methods: {
     pushToNewDeviceType() {
       this.$router.push("/device-type");
     },
     pushToNewDevice() {
       this.$router.push("/device");
-    }
+    },
+       
+    }  ,
+    computed:{
+      deviceTypes() {
+            return this.$store.getters.deviceTypes;
+        },
+        myData(){
+          let arr = []
+          arr.push(this.deviceTypes)
+          return arr
+        },
+        devices(){
+          return this.$store.getters.devices
+        }
+    }  
   }
-};
 </script>
