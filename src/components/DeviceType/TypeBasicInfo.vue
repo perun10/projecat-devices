@@ -8,7 +8,7 @@
           class="form-control"
           type="text"
           title="Required field."
-          v-model.lazy="name"
+          v-model="name"
           required
         >
       </div>
@@ -26,13 +26,13 @@
           maxlength="1000"
           required
           title="Required field."
-          v-model.lazy="description"
+          v-model="description"
           class="form-control"
         ></textarea>
       </div>
       <div>
         <button class="btn btn-secondary">Cancel</button>
-        <button class="btn btn-primary" @click="newDeviceType">Next</button>
+        <button class="btn btn-primary" @click.prevent="newDeviceType">Next</button>
       </div>
     </form>
   </div>
@@ -46,12 +46,15 @@ export default {
   },
   beforeCreate(){
     if(!this.$store.getters.deviceTypes){
-      this.$store.dispatch('getDeviceProperties')
+      this.$store.dispatch('getDeviceTypes')
     }
   },
   computed: {
     deviceTypes() {
       return this.$store.getters.deviceTypes;
+    },
+    selectedId() {
+        return this.$store.getters.selectedDeviceTypeId;
     },
     myDeviceTypesArr(){
         let arr = []
@@ -71,38 +74,31 @@ export default {
     }
   },
   methods: {
-    newDeviceType() {
-      let update = {
-        properties: [
-          {
-            nameProperty: "Slot 1",
-            type: "string",
-            required: true
-          },
-          {
-            nameProperty: "Slot 2",
-            type: "string",
-            required: true
-          }
-        ],
-        id: 4
-      };
-      this.axios
-        .put(
-          "http://localhost:21021/api/services/app/DeviceService/UpdateDeviceTypeProperties",
-          update
-        )
-        .then(response => {
-          console.log(response);
-        });
-    }
+    newDeviceType() {    
+        let createDeviceType = {
+            "id": 0,
+            "parentid": this.selectedId,
+            "name": this.name,
+            "description": this.description
+        }
+
+        this.$store.dispatch('getDeviceTypeProperties', createDeviceType)
+        this.$store.commit('setDeviceTypeName', this.name)
+        
+        
+        this.goBack();
+        },
+        goBack() {
+            this.$emit('clicked', 'builder');
+        }
   },
   data() {
     return {      
       arrNames: [],
       name: "",
-      parentDeviceType: "Laptop",
       description: "",
+      parentDeviceType: "Laptop",
+      description: ""
     };
   }
 };

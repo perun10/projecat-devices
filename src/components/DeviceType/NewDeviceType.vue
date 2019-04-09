@@ -14,14 +14,14 @@
             </ul>
             <!-- basic info tab -->
             <div v-if="tab === 'info'">
-                <type-basic-info></type-basic-info>
+                <type-basic-info @clicked="changeTab"></type-basic-info>
             </div>
 
             <!-- property builder tab -->
             <div v-if="tab === 'builder'">
                 <type-property-builder @clicked="changeTab"></type-property-builder>
             </div>
-
+            
         </div>
     </div>
 </template>

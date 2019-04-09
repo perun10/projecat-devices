@@ -1,17 +1,12 @@
 <template>
-    <div class="container">
-       <div class="row">
-           <div class="col-8"  v-if="deviceTypes">
-               <!-- ZA REKURZIJU -->
-               <v-flex col8>
-                   <recursive-component
-                       v-if="deviceTypes"
-                       :device="deviceTypes">
-                   </recursive-component>
-               </v-flex>
-              
-               <!-- ZA FLAT -->
-               <!-- <div v-for="(item, index) in deviceTypes.children" :key="index" class="property">
+  <v-container grid-list-md>
+    <v-layout row wrap grid-list-md text-xs-center>
+      <!-- ZA REKURZIJU -->
+      <v-flex xs8>
+        <!-- <recursive-component v-if="deviceTypes" :device="deviceTypes"></recursive-component> -->
+
+        <!-- ZA FLAT -->
+        <!-- <div v-for="(item, index) in deviceTypes.children" :key="index" class="property">
                    <p class="propertyHeader">"{{ item.name }}" properties</p>
                    <p class="propertyDescription">{{ item.description }}</p>
                    <div v-for="(item, index) in item.properties" :key="index">
@@ -20,236 +15,202 @@
                            <input type="text">
                        </div>
                    </div>
-               </div> -->
-           </div>
-           <v-flex col4 class="border">
-               <p class="row">Fields</p>
-               <p class="row">Drag & drop or click to add</p>
-               <p class="row">Text</p>
-               <p class="row">Text Area</p>
-           </v-flex>
-       </div>
-       <div class="row border justify-content-center buttons">
-           <button @click="cancel">Cancel</button>
-           <button @click="goBack">Back</button>
-           <button class="btn-save" >Save</button>
-       </div>
-   </div>
+        </div>-->
+        <div v-for="(item, index) in deviceTypesProperties" :key="index" class="property">
+          <div>
+            <p class="propertyHeader">"{{ item.name }}" properties</p>
+            <p class="propertyDescription">{{ item.description }}</p>
+
+            {{item.properties}}
+            <draggable
+              :list="item.properties"
+              class="list-group"
+              draggable=".item"
+              group="a"
+              v-if="item.name===deviceTypeName"
+            >
+              <div
+                class="list-group-item item"
+                v-for="(element,index2) in item.properties"
+                :key="index2"
+              >
+                <label>{{index2}}</label>
+                <component name="Raonic" :is="element.name" :id="element.name+index2"/>
+                <v-btn color="success" class="btn-save" @click="onSave(index2,element.name+index2)">X</v-btn>
+              </div>
+            </draggable>
+            <!-- <div v-for="(item, index) in item.properties" :key="index">
+                       <div class="propertyBody">
+                           <p>{{ item.nameProperty }} <span v-if="item.required" class="required">*</span></p>
+                           <input type="text">
+                       </div>
+            </div>-->
+          </div>
+        </div>
+    
+      </v-flex>
+
+      <v-flex xs4 class="border">
+        <!-- <p>Fields</p>
+        <p>Drag & drop or click to add</p>
+        <p>Text</p>
+        <p>Text Area</p>-->
+            {{myArray}} 
+        <draggable id="first" data-source="juju" :value="myArray" group="a">
+          <div
+            class="list-group-item item"
+            v-for="(element,index3) in myArray"
+            :key="index3"
+          >{{ element.name }}</div>
+        </draggable>
+        {{myDeviceTypeProperties}}
+      </v-flex>
+    </v-layout>
+    <v-layout row wrap grid-list-md text-xs-center>
+      <v-flex xs12 style="margin-top:15px;">
+        <v-btn color="error" @click="cancel">Cancel</v-btn>
+        <v-btn color="info" @click="goBack">Back</v-btn>
+        <v-btn color="success" class="btn-save">Save</v-btn>
+      </v-flex>
+    </v-layout>
+  </v-container>
 </template>
 
 <script>
-import RecursiveComponent from './RecursiveComponent.vue'
-
+import RecursiveComponent from "./RecursiveComponent.vue";
+import draggable from "vuedraggable";
+// console.log('Name'+)
+import Vue from 'vue'
 export default {
-    components: {
-        RecursiveComponent
+  components: {
+    RecursiveComponent,
+    draggable
+  },
+  computed: {
+    deviceTypeName() {
+      return this.$store.getters.getdeviceTypeName;
     },
-    computed: {
-        deviceTypes() {
-            return this.$store.getters.deviceTypes;
+    deviceTypesProperties() {
+      return this.$store.getters.deviceTypesProperties;
+    },
+    properties() {
+      this.deviceTypesProperties.forEach(item => {
+        if (item.properties === null) {
+          item.properties.push("test");
+          return item.properties;
         }
+      });
+      return item.properties;
     },
-    beforeCreate() {
-        this.$store.dispatch('getDeviceProperties')
-    },
-    methods: {
-        cancel() {
-            this.$router.push('/');
-        },
-        goBack() {
-            this.$emit('clicked', 'info');
-        }
-    },
-    data() {
-        return {
-//           items:[
-//     {
-//       "id":1,
-//       "name":"RACUNAR",
-//       "parentid":null,
-//       "description":"OPIS",
-//       "properties":[
-//         {"nameProperty":"cpu","required":true,"type":"Text"},
-//         {"nameProperty":"ram","required":false,"type":"Text"}
-//       ]
-//     },
-//     {
-//       "id":2,
-//       "name":"LAPTOP",
-//       "parentid":1,
-//       "description":"OPIS",
-//       "properties":[{"nameProperty":"touchpad","required":false,"type":"Text"}]
-//     },
-//     {
-//       "id":3,
-//       "name":"ULTRA - LAPTOP",
-//       "parentid":2,
-//       "description":"ULTRA LAGAN",
-//       "properties":[
-//         {"nameProperty":"weight","required":true,"type":"Text"},
-//         {"nameProperty":"boja","required":true,"type":"zelena"}
-//       ]
-//     },
-//     {
-//       "id":4,
-//       "name":"Ultra Book",
-//       "properties":[{"nameProperty":"tezina","required":true,"type":"Text"}]
-//     }
-//    ]
-                    //         }
-                    //         ],
-                    //         children: [
-                    //         {
-                    //             id: 3,
-                    //             name: 'ULTRA - LAPTOP',
-                    //             parentid: 2,
-                    //             description: 'ULTRA LAGAN',
-                    //             properties: [
-                    //             {
-                    //                 nameProperty: 'weight',
-                    //                 required: true,
-                    //                 type: 'Text'
-                    //             }
-                    //             ],
-                    //             children: [
-                    //             {
-                    //                 id: 4,
-                    //                 name: 'Air Book',
-                    //                 parentid: 3,
-                    //                 description: 'Microsoft Air Book',
-                    //                 properties: [
-                    //                 {
-                    //                     nameProperty: 'size',
-                    //                     required: false,
-                    //                     type: 'input'
-                    //                 }
-                    //                 ]
-                    //             }
-                    //             ]
-                    //         },
-                    //         {
-                    //             id: 7,
-                    //             name: 'Standard Laptop',
-                    //             parentid: 2,
-                    //             description: 'Standardni laptop',
-                    //             properties: [
-                    //             {
-                    //                 nameProperty: 'price',
-                    //                 required: true,
-                    //                 type: 'Text'
-                    //             }
-                    //             ]
-                    //         }
-                    //         ]
-                    //     },
-                    //     {
-                    //         id: 5,
-                    //         name: 'Desktop',
-                    //         parentid: 1,
-                    //         description: 'Home desktop PC',
-                    //         properties: [
-                    //         {
-                    //             nameProperty: 'Case',
-                    //             required: false,
-                    //             type: 'Label'
-                    //         }
-                    //         ],
-                    //         children: [
-                    //             {
-                    //                 id: 99,
-                    //                 name: 'Air Jordan',
-                    //                 parentid: 3,
-                    //                 description: 'JORDAN',
-                    //                 properties: [
-                    //                 {
-                    //                     nameProperty: 'size',
-                    //                     required: true,
-                    //                     type: 'input'
-                    //                 },
-                    //                 {
-                    //                     nameProperty: 'color',
-                    //                     required: false,
-                    //                     type: 'input'
-                    //                 }
-                    //                 ]
-                    //             }
-                    //             ]
-                    //     },
-                    //     {
-                    //         id: 6,
-                    //         name: 'Server',
-                    //         parentid: 1,
-                    //         description: 'Firewall',
-                    //         properties: [
-                    //         {
-                    //             nameProperty: 'Housing',
-                    //             required: true,
-                    //             type: 'Label'
-                    //         }
-                    //         ]
-                    //     }
-                    //     ]
-                    // }
-                    
-        }
+    selectedId() {
+      return this.$store.getters.selectedDeviceTypeId;
     }
-}
+  },
+  // beforeCreate() {
+  //     this.$store.dispatch('getDeviceProperties')
+  // },
+  methods: {
+      onSave(id,value){
+    //    console.log(Vue.options.components['Raonic'])
+          var temp = document.getElementById(value).value
+          console.log(id+'-'+temp)
+
+      },
+    adding(){
+        this.myArray.push({ id: 5, name: "input" })
+    }
+      ,
+    cancel() {
+      this.$router.push("/");
+    },
+    goBack() {
+      this.$emit("clicked", "info");
+    }
+  }
+ 
+//   watch:{
+//       myArray(value){
+//             // console.log(value)
+//             // this.myArray.push({name:value.name,id:value.id++})
+//             this.myDeviceTypeProperties = value
+//       },
+//       myDeviceTypeProperties(){
+//           this.myArray.push({id: 1, name: "input" })
+//       }
+//  }
+ ,
+  data() {
+    return {
+      myDeviceTypeProperties:[],
+      myArray: [
+        { id: 1, name: "textarea" },
+        { id: 2, name: "input" },
+        { id: 3, name: "img" }
+      ],
+      myArray2: [
+        { id: 11, name: "Television Screen" },
+        { id: 12, name: "Footer size" },
+        { id: 13, name: "Weight" }
+      ],
+      myArray3: [],
+      test: "test"
+    };
+  }
+};
 </script>
 
 <style scoped>
-    button {
-        width: 141px;
-        height: 34px;
-        color: #4A86E8;
-        border: 1px solid #4A86E8;
-        margin: auto 40px auto 0;
-    }
+button {
+  width: 141px;
+  height: 34px;
+  color: #4a86e8;
+  border: 1px solid #4a86e8;
+  margin: auto 40px auto 0;
+}
 
-    .btn-save {
-        background-color: #4a86e8;
-        color: white;
-    }
+.btn-save {
+  background-color: #4a86e8;
+  color: white;
+}
 
-    .buttons {
-        height: 77px;
-    }
- input {
-        border: 1px solid #404040;
-        margin-bottom: 15px;
-        width: 319px;
-        height: 32px;
-        padding-left: 6px;
-    }
+.buttons {
+  height: 77px;
+}
+input {
+  border: 1px solid #404040;
+  margin-bottom: 15px;
+  width: 319px;
+  height: 32px;
+  padding-left: 6px;
+}
 
-    .property {
-        max-width: 747px;
-        margin: 0 auto;
-        border: 1px solid #404040;
-        margin-bottom: 25px;
-    }
+.property {
+  max-width: 747px;
+  margin: 0 auto;
+  border: 1px solid #404040;
+  margin-bottom: 25px;
+}
 
-    .propertyHeader {
-        height: 40px;
-        background-color: #efefef;
-        font-weight: 700;
-        padding-left: 25px;
-        vertical-align: middle;
-        line-height: 40px;
-        border-bottom: 1px solid #404040;
-    }
+.propertyHeader {
+  height: 40px;
+  background-color: #efefef;
+  font-weight: 700;
+  padding-left: 25px;
+  vertical-align: middle;
+  line-height: 40px;
+  border-bottom: 1px solid #404040;
+}
 
-    .propertyBody {
-        margin-left: 25px;
-        display: inline-block;
-    }
+.propertyBody {
+  margin-left: 25px;
+  display: inline-block;
+}
 
-    .required {
-        color: red;
-    }
+.required {
+  color: red;
+}
 
-    .propertyDescription {
-        margin-left: 25px;
-    }
-
-
+.propertyDescription {
+  margin-left: 25px;
+}
 </style>

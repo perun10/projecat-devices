@@ -19,7 +19,6 @@
 <script>
 import "@progress/kendo-ui";
 import "@progress/kendo-theme-default/dist/all.css";
-
 import {
   DropDownTree,
   DropDownTreeInstaller
@@ -57,6 +56,7 @@ export default {
     },
     onChange: function(ev) {
       this.selectedDeviceTypeId = ev.sender._values[0].id.id;
+      this.$store.commit('setSelectedDeviceTypeId',this.selectedDeviceTypeId)
       console.log(this.selectedDeviceTypeId);
     }
   },

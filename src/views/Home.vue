@@ -47,7 +47,7 @@
         <v-layout row wrap>
           <v-flex xs12>
         
-              <v-data-table :headers="header" :items="devices" class="elevation-1" v-if="devices">
+              <!-- <v-data-table :headers="header" :items="devices" class="elevation-1" v-if="devices">
                 <template v-slot:items="props">
                   <td>{{props.item.name}}</td>
                   <td class="text-center">{{props.item.deviceType}}</td>
@@ -55,6 +55,7 @@
              
                 </template>
               </v-data-table>
+              {{devices}} -->
               <!-- <div v-for="data in deviceTypes" >
                 <p>{{data}}</p>
               </div> -->
@@ -101,11 +102,11 @@ export default {
     }
   },
   beforeCreate() {
-  this.$store.dispatch('getDeviceProperties')
+  this.$store.dispatch('getDeviceTypes')
   // this.$store.dispatch('getDevices')
     },
     mounted(){
-      console.log(this.deviceTypes)
+      // console.log(this.deviceTypes)
     },
   methods: {
     pushToNewDeviceType() {
@@ -126,7 +127,11 @@ export default {
           return arr
         },
         devices(){
-          return this.$store.getters.devices
+          let arr = []
+          // return this.$store.getters.devices
+          arr.push(this.$store.getters.devices)
+          // console.log(arr)
+          return arr
         }
     }  
   }
