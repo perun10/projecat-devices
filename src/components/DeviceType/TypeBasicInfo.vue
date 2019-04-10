@@ -82,7 +82,7 @@ export default {
             "description": this.description
         }
 
-        this.$store.dispatch('getDeviceTypeProperties', createDeviceType)
+        this.$store.dispatch('createNewDeviceType', createDeviceType)
         this.$store.commit('setDeviceTypeName', this.name)
         
         

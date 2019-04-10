@@ -28,7 +28,7 @@
             v-if="deviceTypes">
               <template v-slot:append="{item , active}" class="text-center">
                 <p class="mr-3 mt-3">{{item.description}}</p>
-                <button type="button" class="btn btn-link" v-if="item.id!=1">Delete</button>
+                <button type="button" class="btn btn-link" v-if="item.id!=1" @click="onDelete(item.id)">Delete</button>
                 <button type="button" class="btn btn-link">Edit</button>
               </template>
             </v-treeview>
@@ -47,15 +47,21 @@
         <v-layout row wrap>
           <v-flex xs12>
         
-              <!-- <v-data-table :headers="header" :items="devices" class="elevation-1" v-if="devices">
-                <template v-slot:items="props">
-                  <td>{{props.item.name}}</td>
-                  <td class="text-center">{{props.item.deviceType}}</td>
-                  <td class="text-right">{{props.item.description}}</td>
-             
+               <!-- <v-data-table :headers="header" :items="devices" class="elevation-1" v-if="devices">
+                <template v-slot:items="props" >
+                 
+                  <template v-for="(it,index) in props.item.data.result">
+                    <tr>
+                 <td class="text-left">{{it.name}}</td>
+                  <td class="text-center">{{it.deviceTypeName}}</td>
+                  <td class="text-right">{{it.description}}</td>
+             </tr>
+
+                  
+                  </template>
                 </template>
-              </v-data-table>
-              {{devices}} -->
+              </v-data-table> -->
+              <!-- {{devices}} -->
               <!-- <div v-for="data in deviceTypes" >
                 <p>{{data}}</p>
               </div> -->
@@ -106,7 +112,6 @@ export default {
   // this.$store.dispatch('getDevices')
     },
     mounted(){
-      // console.log(this.deviceTypes)
     },
   methods: {
     pushToNewDeviceType() {
@@ -115,6 +120,17 @@ export default {
     pushToNewDevice() {
       this.$router.push("/device");
     },
+    onDelete(id){
+      this.$store.dispatch('deleteDeviceType',{id:id})
+      .then(  this.$store.dispatch('getDeviceTypes')
+)
+      
+
+      
+      //   console.log('obrisano')
+      // } )
+
+    }
        
     }  ,
     computed:{
