@@ -3,16 +3,34 @@
     <!-- <select v-for="item in flatted" :key="item.id">
     <option>{{item.name}}</option>
     </select>-->
-    <DropDownTree :data-source="flatted" :data-text-field="['name']" @change="onChange" :placeholder="'Select device type parent...'"  style="width: 300px;"></DropDownTree>
-    {{selectedDeviceTypeId}}
-    <!-- 
-    <BasicSelect v-for="(child, index) in data.children"
+    <DropDownTree
+      :data-source="data"
+      :data-text-field="['name']"
+      :scheme-model-hasChildren="'children'"
+      :scheme-model-children="'items'"
+      @change="onChange"
+      :placeholder="'Select device type parent...'"
+      style="width: 300px;"
+    ></DropDownTree>
+
+    <!-- {{localDataSource.options}} -->
+    <!-- {{data[0].children[1]}} -->
+    <!-- <BasicSelect v-for="child in data"
             :data="child"
-    :key="index"/>-->
+    :key="child.index"/>-->
     <!-- <v-select :items="flatted" :item-value="flatted" :placeholder="flatted.name"></v-select> -->
     <!-- <select v-model="test">
 <option v-for="flat in flatted" :key="flat.id" :value="flat.id">{{flat.name}}</option>
     </select>-->
+    <!-- localDataSource: new kendo.data.HierarchicalDataSource({
+        data: this.data,
+        schema:{
+          model:{
+            hasChildren: 'children',
+            children: this.data[0].children[0].name
+          }
+        }
+    })-->
   </div>
 </template>
 
@@ -32,17 +50,54 @@ export default {
   data() {
     return {
       selectedDeviceTypeId: 0,
-      test: "Racunar",
-      localDataSource: new kendo.data.HierarchicalDataSource({
-        data: this.data
-      })
+      test: "children",    
+      arryData:[
+
+        
+    {
+      "id": 1,
+      "name": "RACUNAR 1",
+      "parentid": null,
+      "description": "RACUNAR PARENT 0",      
+      "items": [
+        {
+          "id": 2,
+          "name": "LAPTOP",
+          "parentid": 1,
+          "description": "Basic Laptop",
+         
+        }
+
+      ]
+        },
+        {
+          "id": 3,
+      "name": "Namjestaj 1",
+      "parentid": null,
+      "description": "RACUNAR PARENT 0",      
+      "items":[
+        {
+          "id": 5,
+          "name": "LAPTOP 3 ",
+          "parentid": 3,
+          "description": "Basic Laptop",
+        }
+      ]
+        }
+      ]
+      
     };
+  },
+  mounted(){
+      // console.log(this.localDataSource.data()[0]._childrenOptions[0].name)
+      console.log(this.data)
   },
   methods: {
     takeId(id) {
       console.log(id);
     },
     flatten(items) {
+      console.log(items);
       var final = [];
       var self = this;
       items.forEach(item => {
@@ -55,14 +110,14 @@ export default {
       return final;
     },
     onChange: function(ev) {
-      this.selectedDeviceTypeId = ev.sender._values[0].id.id;
-      this.$store.commit('setSelectedDeviceTypeId',this.selectedDeviceTypeId)
-      console.log(this.selectedDeviceTypeId);
+      this.selectedDeviceTypeId = ev.sender._values[0].id;
+      console.log(this.selectedDeviceTypeId)
+      this.$store.commit("setSelectedDeviceTypeId", this.selectedDeviceTypeId);
     }
   },
   computed: {
     flatted() {
-      return this.flatten(this.data);
+      return this.flatten(this.localDataSource);
     }
   },
   watch: {

@@ -14,7 +14,7 @@
       </div>
       <div class="form-group">
       
-            <BasicSelect :data="myDeviceTypesArr" v-if="deviceTypes"/>
+            <BasicSelect :data="deviceTypes" v-if="deviceTypes"/>
         
 
 

@@ -12,7 +12,7 @@ const mutations = {
 
 const actions = {
     getDevices({commit}){
-        axios.get('http://localhost:21021/api/services/app/DeviceService/GetAllDevices')
+        axios.get('http://localhost:21021/api/services/app/DeviceService/GetDevices')
         .then((response) => {
             let data = response;
           commit('setDevices', data);

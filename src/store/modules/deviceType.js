@@ -6,7 +6,8 @@ const state = {
     selectedDeviceTypeId: null,
     deviceTypeName: null,
     newDeviceTypeId: null,
-    trueFalse:null
+    trueFalse:null,
+    activeDeviceTypeID: ''
 };
 
 const mutations = {
@@ -22,39 +23,44 @@ const mutations = {
     setDeviceTypeName(state, payload) {
         state.deviceTypeName = payload;
     },
-    setFalse(state,payload){
+    setFalse(state, payload){
         state.trueFalse = payload
+    },
+    setActiveDeviceTypeID(state, payload){
+        state.activeDeviceTypeID = payload;
     }
 };
 
 const actions = {
     getDeviceTypes({ commit }) {
-        axios.get('http://localhost:21021/api/services/app/DeviceTypeService/GetDeviceTypeNestedDtos')
+        axios.get('http://localhost:21021/api/services/app/DeviceTypeService/GetDeviceTypes')
         .then((response) => {
-            // console.log(response)
-            let data = response.data.result[0];
-          commit('setDeviceTypes', data);
+            let data = response.data.result;
+            commit('setDeviceTypes', data);
         })
     },
     createNewDeviceType({ commit }, payload) {
         axios.post('http://localhost:21021/api/services/app/DeviceTypeService/CreateOrUpdateDeviceType', payload)
         .then((response) => {
             let data = response.data.result;
-            // console.log(data)
             commit('setNewDeviceTypeProperties', data);
+            commit('setActiveDeviceTypeID', data[data.length-1].id);
         })
     },
-    deleteDeviceType({commit},payload){
+    deleteDeviceType({dispatch},payload){
         // console.log(payload.id)
-        axios.delete('http://localhost:21021/api/services/app/DeviceTypeService/Delete', {
+        axios.delete('http://localhost:21021/api/services/app/DeviceTypeService/DeleteDeviceType', {
             params: {
                 id: payload.id
             }
         })
+        .then(()=>{
+            dispatch('getDeviceTypes')
+        })
         .catch(error=>{
             console.log(error.message)
         })
-        commit('setFalse',true)
+       
 
     }
 };
@@ -71,6 +77,9 @@ const getters = {
     },
     getdeviceTypeName(state){
         return state.deviceTypeName
+    },
+    activeDeviceTypeID(state){
+        return state.activeDeviceTypeID;
     }
 };
 

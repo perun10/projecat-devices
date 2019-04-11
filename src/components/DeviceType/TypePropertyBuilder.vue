@@ -5,37 +5,39 @@
             <v-flex xs8>             
                 <div v-for="(item, index) in deviceTypesProperties" :key="index" class="property">
                     <div>
-                      <p>{{item.id}}</p>
                         <p class="propertyHeader">"{{ item.name }}" properties</p>
-                        <p class="propertyDescription">{{ item.description }}</p>
-                        
                         <draggable
                             :list="item.properties"
                             class="list-group"
                             draggable=".item"
                             group="a"
-                            v-if="item.name === deviceTypeName">
+                            v-if="item.name === deviceTypeName"
+                            @change="newModal(activeType)"                          
+                            >
                             <div
                                 class="list-group-item item"
                                 v-for="(element,index2) in item.properties"
                                 :key="index2"
-                            >
-                                 <p v-if="properties[index2]">{{ properties[index2].nameProperty }} <span v-if="properties[index2].required" class="required">*</span></p>
+                                >
+                                <p v-if="properties[index2]">{{ properties[index2].nameProperty }} <span v-if="properties[index2].required" class="required">*</span></p>
                                 <component :is="element.type" :id="element.type+index2"/>                                
-                                <v-btn color="success" class="btn-save" @click="openModal(index2,element.type,item.id)">X</v-btn>
-                                <v-btn color="red" class="btn-save" @click="deleteProperty(item.properties,index2)">X</v-btn>
+                                <v-btn color="success" class="btn-save" @click="openModal(index2, element.type)">X</v-btn>
+                                <v-btn color="red" class="btn-save" @click="deleteProperty(item.properties, index2)">X</v-btn>
                             </div>
                         </draggable>
-                         <div v-for="(itemProperty, index) in item.properties" :key="index"  v-if="item.name !== deviceTypeName">
-                            <div class="propertyBody">
-                                <!-- <p v-if="properties[index]">{{ properties[index].nameProperty }} <span v-if="properties[index].required" class="required">*</span></p> -->
-                               <p>{{itemProperty.nameProperty}} <span v-if="itemProperty.required" class="required">*</span></p> 
-                               <component :is="itemProperty.type"/>
-                            </div> 
+                        <div v-if="item.name !== deviceTypeName">
+                            <div v-for="(itemProperty, index) in item.properties" :key="index">
+                                <div class="propertyBody">
+                                    <!-- <p v-if="properties[index]">{{ properties[index].nameProperty }} <span v-if="properties[index].required" class="required">*</span></p> -->
+                                    <p>{{itemProperty.nameProperty}} <span v-if="itemProperty.required" class="required">*</span></p> 
+                                    <component :is="itemProperty.type" disabled/>
+                                </div> 
+                            </div>
                         </div>
                     </div>
                 </div>
             </v-flex>
+
                 <!-- modal -->
                 <template>
                     <v-layout row justify-center>
@@ -49,6 +51,7 @@
                                         <v-layout wrap>
                                             <v-flex xs12>
                                                 <v-text-field label="Label*" v-model="nameProperty" required>{{ nameProperty }}</v-text-field>
+                                                <!-- <small id="labelError">This label is already in use. Pick another one.</small> -->
                                             </v-flex>
                                             <v-flex xs12>
                                                 <v-checkbox v-model="checkbox" :label="`Mandatory field`"></v-checkbox>
@@ -67,11 +70,12 @@
                 </template>
             <v-flex xs4 class="border">
                 <draggable id="first" data-source="juju" :value="myArray" group="a">
-                    <div
+                    <div @mousedown="activeType = element.type"
                         class="list-group-item item"
                         v-for="(element,index3) in myArray"
                         :key="index3"
-                    >{{ element.name }}
+                    >
+                    <p>{{ element.name }}</p>
                     </div>
                 </draggable>
             </v-flex>
@@ -100,8 +104,16 @@ export default {
         return {
             myDeviceTypeProperties: [],
             myArray: [
-                { id: 1, name: "Text Area" , type:'textarea'},
-                { id: 2, name: "Input field",type:'input' }
+                {
+                    id: 1,
+                    name: "Text Area",
+                    type:'textarea'
+                },
+                {
+                    id: 2,
+                    name: "Input field",
+                    type:'input'
+                }
             ],
             dialog: false,
             checkbox: false,
@@ -110,7 +122,8 @@ export default {
             properties: [],
             filterId:null,
             type:'',
-            activeItemId:'',
+            activeType: '',
+            labelError: false
         };
     },
     computed: {
@@ -119,24 +132,38 @@ export default {
         },
         deviceTypesProperties() {
             return this.$store.getters.newDeviceTypeProperties;
-        }
-        // ,
-        // propertiesComputed() {
-        //     this.newDeviceTypeProperties.forEach(item => {
-        //         if (item.properties === null) {
-        //         item.properties.push("test");
-        //         return item.properties;
-        //         }
-        //     });
-        //     return item.properties;
-        // }
-        ,
+        },
         selectedId() {
             return this.$store.getters.selectedDeviceTypeId;
-        }
+        },
+        deviceTypePropertyField() {
+            return this.$store.getters.newDeviceTypeProperties[this.deviceTypesProperties.length - 1].properties;
+        },
+        activeDeviceTypeID() {
+            return this.$store.getters.activeDeviceTypeID;
+        },
+        // labelValidation() {
+        //     this.properties.forEach(property => {
+        //         if(property.nameProperty === this.nameProperty) {
+        //             return true;
+        //         }
+        //     })
+        //     return false;
+        // }
+    },
+    watch: {
+        // nameProperty(value) {
+        //     this.properties.forEach(property => {
+        //         if(property.nameProperty === value) {
+        //            this.labelError = true;
+        //         } else {
+        //             this.labelError = false;
+        //         }
+        //     })
+        // }
     },
     methods: {
-        openModal(id,type,itemID){
+        openModal(id, type){
             const check = this.properties.filter(property => property.id === id);
             if(check.length !== 0) {
                 this.editMode = true;
@@ -144,8 +171,13 @@ export default {
                 this.checkbox = check[0].required;
                 this.fieldId = check[0].id;
             }
-            this.activeItemId = itemID
-            this.type = type
+            this.type = type;
+            this.fieldId = id;
+            this.dialog = true;
+        },
+        newModal(type){
+            const id = this.properties.length;
+            this.type = type;
             this.fieldId = id;
             this.dialog = true;
         },
@@ -170,14 +202,18 @@ export default {
             this.closeDialog();
             
         },
-        // brise samo iz arraya
-        deleteProperty(arr , id) {
+        deleteProperty(arr, id) {
             this.properties.splice(id, 1);
+            this.properties.forEach((property, i) => {
+                property.id = i;
+            });
             arr.splice(id, 1);
-        
         },
         closeDialog() {
-           this.nameProperty = '';
+            if(this.nameProperty === '') {
+                this.deviceTypePropertyField.splice(this.properties.length, 1);
+            }
+            this.nameProperty = '';
             this.checkbox = false;
             this.fieldId = null;
             this.editMode = false;
@@ -192,10 +228,9 @@ export default {
         onSave() {
             const data = {
                 properties: this.properties,
-                // da se sredi, sacuvati id koji dobijemo na NEXT
-                id: this.activeItemId
+                id: this.activeDeviceTypeID
             }
-            this.axios.put('http://localhost:21021/api/services/app/DeviceTypeService/UpdateDeviceTypeProperties', data)
+            this.axios.post('http://localhost:21021/api/services/app/DeviceTypeService/CreateOrUpdateProperties', data)
                 .then(response => console.log(response));
             this.$router.push('/');
         }
@@ -261,5 +296,10 @@ export default {
 
     .propertyDescription {
         margin-left: 25px;
+    }
+
+    #labelError {
+        color: rgb(189, 52, 52);
+        font-size: 14px;
     }
 </style>
