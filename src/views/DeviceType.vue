@@ -7,24 +7,25 @@
     </v-layout>
     <v-layout row wrap>
       <v-flex xs12>
-        <v-layout :justify-space-between="true">
-          <h3>Name</h3>
-          <h3>Description</h3>
-        </v-layout>
+       
+          <v-layout row wrap justify-space-between>
+            <h3>Name</h3>
+            <h3>Description</h3>
+          </v-layout>
+       
         <v-treeview
           :items="deviceTypes"
           v-model="value"
           :open-all="true"
           item-children='items'
-          style="border:1px solid black;"
-          class="border"
+          :hoverable="true"
           v-if="deviceTypes"
         >
-          <template v-slot:append="{item , active}" class="text-center">
-            <p class="mr-3 mt-3">{{item.description}}</p>
+           <template v-slot:append="{item , active}" >
+            <p class="mr-3 mt-3" style="text-align:center;">{{item.description}}</p>
             <button type="button" class="btn btn-link" @click="onDelete(item.id)">Delete</button>
             <button type="button" class="btn btn-link">Edit</button>
-          </template>
+          </template> 
         </v-treeview>
       </v-flex>
       <v-flex></v-flex>
@@ -32,7 +33,7 @@
   </v-container>
 </template>
 <style>
-.v-treeview-node__root {
+.v-treeview{
   border: 1px solid grey;
 }
 </style>
@@ -63,40 +64,6 @@ export default {
           sortable: false,
           value: "description"
         }
-      ],
-      arryData:[
-
-        
-    {
-      "id": 1,
-      "name": "RACUNAR 1",
-      "parentid": null,
-      "description": "RACUNAR PARENT 1",      
-      "items": [
-        {
-          "id": 2,
-          "name": "LAPTOP",
-          "parentid": 1,
-          "description": "Basic Laptop",
-         
-        }
-
-      ]
-        },
-        {
-          "id": 3,
-      "name": "Namjestaj 1",
-      "parentid": null,
-      "description": "RACUNAR PARENT 0",      
-      "items":[
-        {
-          "id": 5,
-          "name": "LAPTOP 3 ",
-          "parentid": 3,
-          "description": "Basic Laptop",
-        }
-      ]
-        }
       ]
     };
   },
@@ -105,7 +72,7 @@ export default {
     // this.$store.dispatch('getDevices')
   },
   created() {
-    console.log(this.deviceTypes);
+    // console.log(this.deviceTypes);
   },
   methods: {
     pushToNewDeviceType() {

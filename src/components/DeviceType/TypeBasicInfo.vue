@@ -9,7 +9,7 @@
           type="text"
           title="Required field."
           v-model="name"
-          required
+          
         >
       </div>
       <div class="form-group">
@@ -24,15 +24,15 @@
         <textarea
           id="description"
           maxlength="1000"
-          required
+          
           title="Required field."
           v-model="description"
           class="form-control"
         ></textarea>
       </div>
       <div>
-        <button class="btn btn-secondary">Cancel</button>
-        <button class="btn btn-primary" @click.prevent="newDeviceType">Next</button>
+        <v-btn color="warning" to='/'>Cancel</v-btn>
+        <v-btn color="primary"  @click.prevent="newDeviceType">Next</v-btn>
       </div>
     </form>
   </div>

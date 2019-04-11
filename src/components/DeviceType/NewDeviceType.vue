@@ -1,57 +1,56 @@
 <template>
-    <div class="container">
-        <div class="container">
-            <h2>New Device Type</h2>
-            <ul class="nav nav-tabs" align="center">
-                <li class="nav-item">
-                    <small>Step 1</small>
-                    <a class="nav-link" :class="{active: tab === 'info'}" @click="tab = 'info'">Basic Info</a>
-                </li>
-                <li class="nav-item">
-                    <small>Step 2</small>
-                    <a class="nav-link" :class="{active: tab === 'builder'}" @click="tab = 'builder'">Property Builder</a>
-                </li>
-            </ul>
-            <!-- basic info tab -->
-            <div v-if="tab === 'info'">
-                <type-basic-info @clicked="changeTab"></type-basic-info>
-            </div>
+  <v-container grid-list-xs>
+    <v-stepper v-model="tab">
+      <v-stepper-header>
+        <v-stepper-step :complete="tab==='builder'" step="1">
+          <small>Step 1</small>
+          Basic Info
+        </v-stepper-step>
+        <v-divider></v-divider>
+        <v-stepper-step :complete="tab==='completed'" step="2">
+          <small>Step 2</small>
+          Property Builder
+        </v-stepper-step>
+      </v-stepper-header>
 
-            <!-- property builder tab -->
-            <div v-if="tab === 'builder'">
-                <type-property-builder @clicked="changeTab"></type-property-builder>
-            </div>
-            
-        </div>
-    </div>
+      <v-stepper-content step="info">
+        <type-basic-info @clicked="changeTab"></type-basic-info>
+      </v-stepper-content>
+
+      <v-stepper-content step="builder">
+        <type-property-builder @clicked="changeTab" style="height:100%;"></type-property-builder>
+      </v-stepper-content>
+    </v-stepper>
+  </v-container>
 </template>
 
 <script>
-import TypeBasicInfo from '@/components/DeviceType/TypeBasicInfo';
-import TypePropertyBuilder from '@/components/DeviceType/TypePropertyBuilder';
-import {store} from '../../store/store.js'
-
+import TypeBasicInfo from "@/components/DeviceType/TypeBasicInfo";
+import TypePropertyBuilder from "@/components/DeviceType/TypePropertyBuilder";
+import { store } from "@/store/store.js";
 
 export default {
-    components: {
-        TypeBasicInfo,
-        TypePropertyBuilder
-    },
-    data() {
-        return {
-            tab: 'info'
-        }
-    },
-    methods: {
-        changeTab(value) {
-            this.tab = value;
-        }
+  components: {
+    TypeBasicInfo,
+    TypePropertyBuilder
+  },
+  data() {
+    return {
+      tab: "info",
+      allowed: 1
+    };
+  },
+  methods: {
+    changeTab(value) {
+      this.tab = value;
+      return value;
     }
-}
+  }
+};
 </script>
 
 <style scoped>
-    .nav-item:hover {
-        cursor: pointer;
-    }
+.nav-item:hover {
+  cursor: pointer;
+}
 </style>

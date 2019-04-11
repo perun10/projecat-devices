@@ -12,7 +12,7 @@
       :placeholder="'Select device type parent...'"
       style="width: 300px;"
     ></DropDownTree>
-
+{{selectedDeviceTypeId}}
     <!-- {{localDataSource.options}} -->
     <!-- {{data[0].children[1]}} -->
     <!-- <BasicSelect v-for="child in data"

@@ -1,9 +1,9 @@
 <template>
-    <v-container grid-list-md>
-        <v-layout row wrap grid-list-md text-xs-center>
+    <div>
+        <v-layout row wrap grid-list-xs text-xs-center>
             <!-- ZA REKURZIJU -->
             <v-flex xs8>             
-                <div v-for="(item, index) in deviceTypesProperties" :key="index" class="property">
+                <div v-for="(item, index) in deviceTypesProperties" :key="index" class="property" style="min-height:120px;">
                     <div>
                         <p class="propertyHeader">"{{ item.name }}" properties</p>
                         <draggable
@@ -39,7 +39,19 @@
             </v-flex>
 
                 <!-- modal -->
-                <template>
+                
+            <v-flex xs4 class="border">
+                <draggable id="first" data-source="juju" :value="myArray" group="a">
+                    <div @mousedown="activeType = element.type"
+                        class="list-group-item item"
+                        v-for="(element,index3) in myArray"
+                        :key="index3"
+                    >
+                    <p>{{ element.name }}</p>
+                    </div>
+                </draggable>
+            </v-flex>
+           
                     <v-layout row justify-center>
                         <v-dialog v-model="dialog" persistent max-width="392px">
                             <v-card>
@@ -67,18 +79,7 @@
                             </v-card>
                         </v-dialog>
                     </v-layout>
-                </template>
-            <v-flex xs4 class="border">
-                <draggable id="first" data-source="juju" :value="myArray" group="a">
-                    <div @mousedown="activeType = element.type"
-                        class="list-group-item item"
-                        v-for="(element,index3) in myArray"
-                        :key="index3"
-                    >
-                    <p>{{ element.name }}</p>
-                    </div>
-                </draggable>
-            </v-flex>
+                
         </v-layout>
         <v-layout row wrap grid-list-md text-xs-center>
             <v-flex xs12 style="margin-top:15px;">
@@ -87,7 +88,8 @@
                 <v-btn color="success" class="btn-save" @click="onSave">Save</v-btn>
             </v-flex>
         </v-layout>
-    </v-container>
+
+    </div>
 </template>
 
 <script>
@@ -241,7 +243,7 @@ export default {
 <style scoped>
 #first{
   position:fixed;
-  width:300px;
+  width:200px;
 }
     button {
         width: 141px;

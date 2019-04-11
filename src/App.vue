@@ -1,12 +1,12 @@
 <template>
   <v-app>
-    <v-toolbar color="white" >
-    <v-toolbar-items style="margin:0 auto;">
-       <v-btn flat to="/">Device Type</v-btn>
-       <v-btn flat to="/devices">Devices</v-btn>
-    </v-toolbar-items>  
+    <v-toolbar color="white">
+      <v-toolbar-items style="margin:0 auto;">
+        <v-btn flat to="/">Device Type</v-btn>
+        <v-btn flat to="/devices">Devices</v-btn>
+      </v-toolbar-items>
     </v-toolbar>
-    
+
     <v-content>
       <router-view></router-view>
     </v-content>
@@ -23,7 +23,6 @@ export default {
     NewDeviceType,
     DeviceType,
     NewDevice
-
   },
   data() {
     return {
