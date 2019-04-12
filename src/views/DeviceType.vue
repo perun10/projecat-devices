@@ -5,43 +5,32 @@
         <button type="button" class="btn btn-primary" @click="pushToNewDeviceType">New device type</button>
       </v-flex>
     </v-layout>
-    <v-layout row wrap>
-      <v-flex xs12>
-       
-          <v-layout row wrap justify-space-between>
-            <h3>Name</h3>
-            <h3>Description</h3>
-          </v-layout>
-       
-        <v-treeview
-          :items="deviceTypes"
-          v-model="value"
-          :open-all="true"
-          item-children='items'
-          :hoverable="true"
-          v-if="deviceTypes"
-        >
-           <template v-slot:append="{item , active}" >
-            <p class="mr-3 mt-3" style="text-align:center;">{{item.description}}</p>
-            <button type="button" class="btn btn-link" @click="onDelete(item.id)">Delete</button>
-            <button type="button" class="btn btn-link">Edit</button>
-          </template> 
-        </v-treeview>
-      </v-flex>
-      <v-flex></v-flex>
-    </v-layout>
+    <treeview :data="deviceTypes"/>
+
   </v-container>
 </template>
 <style>
 .v-treeview{
   border: 1px solid grey;
+  /* border-bottom: none; */
+}
+.v-treeview-node{
+    /* margin-left: 0; */
+
 }
 </style>
 
 <script>
+
+import treeview from '@/components/shared/TreeView.vue'
 export default {
+  components:{
+    treeview,
+  
+  },
   data() {
     return {
+       
       active: "",
       itemKey: [],
       value: [],
@@ -77,12 +66,6 @@ export default {
   methods: {
     pushToNewDeviceType() {
       this.$router.push("/new-device-type");
-    },
-    pushToNewDevice() {
-      this.$router.push("/device");
-    },
-    onDelete(id) {
-      this.$store.dispatch("deleteDeviceType", { id: id });
     }
   },
   computed: {

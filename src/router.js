@@ -29,7 +29,7 @@ export default new Router({
       
     },
     {
-      path:"/device",
+      path:"/new-device",
       name:"new-device",
       component:NewDevice
 

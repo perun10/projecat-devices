@@ -12,7 +12,8 @@
       :placeholder="'Select device type parent...'"
       style="width: 300px;"
     ></DropDownTree>
-{{selectedDeviceTypeId}}
+<!-- {{selectedDeviceTypeId}} -->
+<!-- <v-btn @click="flatten(data)">FLAT</v-btn> -->
     <!-- {{localDataSource.options}} -->
     <!-- {{data[0].children[1]}} -->
     <!-- <BasicSelect v-for="child in data"
@@ -90,21 +91,22 @@ export default {
   },
   mounted(){
       // console.log(this.localDataSource.data()[0]._childrenOptions[0].name)
-      console.log(this.data)
+      // console.log(this.data)
   },
   methods: {
     takeId(id) {
       console.log(id);
     },
-    flatten(items) {
-      console.log(items);
+    flatten(arr) {
+      console.log(arr);
       var final = [];
       var self = this;
-      items.forEach(item => {
+      arr.forEach(item => {
         final.push({ name: item.name, id: { id: item.id } });
         // console.log(item.name);
-        if (typeof item.children !== "undefined") {
-          final = final.concat(self.flatten(item.children));
+        if (typeof item.items !== "undefined") {
+          final = final.concat(self.flatten(item.items));
+          console.log(final)
         }
       });
       return final;

@@ -64,7 +64,7 @@ export default {
   },
   methods: {
     pushToNewDevice() {
-      this.$router.push("/device");
+      this.$router.push("/new-device");
     }
   }
 };

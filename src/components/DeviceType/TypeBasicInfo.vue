@@ -3,36 +3,27 @@
     <form name="device-type">
       <div class="form-group">
         <label for="name">Name:</label>
-        <input
-          id="name"
-          class="form-control"
-          type="text"
-          title="Required field."
-          v-model="name"
-          
-        >
+        <input id="name" class="form-control" type="text" title="Required field." v-model="name">
       </div>
       <div class="form-group">
-      
-            <BasicSelect :data="deviceTypes" v-if="deviceTypes"/>
-        
-
-
+        <BasicSelect :data="deviceTypes" v-if="deviceTypes"/>
       </div>
       <div class="form-group">
         <label for="description-p">Description:</label>
         <textarea
           id="description"
           maxlength="1000"
-          
           title="Required field."
           v-model="description"
           class="form-control"
         ></textarea>
       </div>
+      <div v-if="error" style="color:red">
+        <p>{{msg}}</p>
+      </div>
       <div>
-        <v-btn color="warning" to='/'>Cancel</v-btn>
-        <v-btn color="primary"  @click.prevent="newDeviceType">Next</v-btn>
+        <v-btn color="warning" to="/">Cancel</v-btn>
+        <v-btn color="primary" @click.prevent="newDeviceType">Next</v-btn>
       </div>
     </form>
   </div>
@@ -44,24 +35,26 @@ export default {
   components: {
     BasicSelect
   },
-  beforeCreate(){
-    if(!this.$store.getters.deviceTypes){
-      this.$store.dispatch('getDeviceTypes')
+  beforeCreate() {
+    if (!this.$store.getters.deviceTypes) {
+      this.$store.dispatch("getDeviceTypes");
     }
   },
   computed: {
+    flatted() {
+      return this.flatten(this.deviceTypes);
+    },
     deviceTypes() {
       return this.$store.getters.deviceTypes;
     },
     selectedId() {
-        return this.$store.getters.selectedDeviceTypeId;
+      return this.$store.getters.selectedDeviceTypeId;
     },
-    myDeviceTypesArr(){
-        let arr = []
-        arr.push(this.deviceTypes)
-        return arr
-    }
-    ,
+    myDeviceTypesArr() {
+      let arr = [];
+      arr.push(this.deviceTypes);
+      return arr;
+    },
     myTypeNames() {
       let arr = [];
       this.arrNames.push(this.deviceTypes.name);
@@ -70,11 +63,30 @@ export default {
         this.arrNames.push(this.deviceTypes.children[i].name);
       }
       arr = this.arrNames;
-      return arr
+      return arr;
     }
   },
   methods: {
-    newDeviceType() {    
+    flatten(arr) {
+      var final = [];
+      var self = this;
+      arr.forEach(item => {
+        final.push(item.name);
+        // console.log(item.name);
+        if (typeof item.items !== "undefined") {
+          final = final.concat(self.flatten(item.items));
+        }
+      });
+      return final;
+    },
+    newDeviceType() {
+      if (this.name && this.description) {
+        
+        let arr = []
+        arr = this.flatted
+        // console.log(arr)
+        if(!arr.includes(this.name)){    
+        this.error = false
         let createDeviceType = {
             "id": 0,
             "parentid": this.selectedId,
@@ -84,16 +96,25 @@ export default {
 
         this.$store.dispatch('createNewDeviceType', createDeviceType)
         this.$store.commit('setDeviceTypeName', this.name)
-        
-        
+
         this.goBack();
-        },
-        goBack() {
-            this.$emit('clicked', 'builder');
+        }else{
+          this.msg = 'Name already exists'
+          this.error = true
         }
+      } else {
+        this.error = true;
+      }
+    },
+    goBack() {
+      this.$emit("clicked", "builder");
+    }
   },
   data() {
-    return {      
+    return {
+      msg:'Name and description needed',
+      test: [],
+      error: false,
       arrNames: [],
       name: "",
       description: "",

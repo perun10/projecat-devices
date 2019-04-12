@@ -59,9 +59,20 @@ const actions = {
         })
         .catch(error=>{
             console.log(error.message)
-        })
-       
+        })    
 
+    },
+    getDeviceTypeProperties({commit},payload){
+        axios.get('http://localhost:21021/api/services/app/DeviceTypeService/GetDeviceTypesWithProperties',{
+            params: {
+                id: payload
+            }
+        })
+        .then(response => {
+            let data = response.data.result
+            commit('setNewDeviceTypeProperties',data)
+        }
+            )
     }
 };
 

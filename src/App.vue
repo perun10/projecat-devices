@@ -17,12 +17,15 @@
 import NewDeviceType from "@/components/DeviceType/NewDeviceType";
 import DeviceType from "@/views/DeviceType.vue";
 import NewDevice from "@/components/NewDevice/NewDevice";
+import Loader from "@/components/shared/Loader"
+
 export default {
   name: "App",
   components: {
     NewDeviceType,
     DeviceType,
-    NewDevice
+    NewDevice,
+    Loader
   },
   data() {
     return {
