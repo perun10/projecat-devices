@@ -6,24 +6,26 @@
         <input id="name" class="form-control" type="text" title="Required field." v-model="name">
       </div>
       <div class="form-group">
-        <BasicSelect :data="deviceTypes" v-if="deviceTypes"/>
+        <!--   -->
+        <BasicSelect :data="deviceTypes" :placeholder="placeholder" v-if="deviceTypes"/>
       </div>
       <div class="form-group">
         <label for="description-p">Description:</label>
         <textarea
-          id="description"
-          maxlength="1000"
-          title="Required field."
-          v-model="description"
-          class="form-control"
+            id="description"
+            maxlength="1000"
+            title="Required field."
+            v-model="description"
+            class="form-control"
         ></textarea>
       </div>
       <div v-if="error" style="color:red">
-        <p>{{msg}}</p>
+          <p>{{ msg }}</p>
       </div>
       <div>
         <v-btn color="warning" to="/">Cancel</v-btn>
-        <v-btn color="primary" @click.prevent="newDeviceType">Next</v-btn>
+        <v-btn color="primary" @click.prevent="newDeviceType" v-if="!editMode">Next</v-btn>
+        <v-btn color="primary" @click.prevent="editDeviceType" v-if="editMode">Next</v-btn>
       </div>
     </form>
   </div>
@@ -40,12 +42,31 @@ export default {
       this.$store.dispatch("getDeviceTypes");
     }
   },
+  beforeDestroy() {
+    this.$store.commit('setEditMode', false);
+  },
+  mounted(){
+    console.log(this.selectedId)
+  },
+  created() {
+    if(this.editMode) {
+      this.name = this.activeDeviceType.name;
+      this.description = this.activeDeviceType.description;
+      this.placeholder = this.activeDeviceType.parentId;
+    }
+  },
   computed: {
     flatted() {
       return this.flatten(this.deviceTypes);
     },
     deviceTypes() {
       return this.$store.getters.deviceTypes;
+    },
+    activeDeviceType() {
+      return this.$store.getters.activeDeviceType;
+    },
+    editMode() {
+      return this.$store.getters.editMode;
     },
     selectedId() {
       return this.$store.getters.selectedDeviceTypeId;
@@ -106,12 +127,34 @@ export default {
         this.error = true;
       }
     },
+    editDeviceType() {
+        // console.log(this.activeDeviceType)
+        // console.log(this.activeDeviceType.name)
+        // console.log(this.activeDeviceType.description)
+        // console.log(this.activeDeviceType.parentid)
+      let deviceTypeData;
+
+      let parentID;
+        this.selectedId === null ? parentID = this.activeDeviceType.parentid : parentID = this.selectedId;
+      
+      deviceTypeData = {
+          "id": this.activeDeviceType.id,
+          "parentid": parentID,
+          "name": this.name,
+          "description": this.description
+      }
+
+      this.$store.dispatch('createNewDeviceType', deviceTypeData);
+      this.$store.commit('setDeviceTypeName', this.name);
+      this.$emit('clicked', 'builder');
+    },
     goBack() {
       this.$emit("clicked", "builder");
     }
   },
   data() {
     return {
+      placeholder: 'Select device type parent...',
       msg:'Name and description needed',
       test: [],
       error: false,
@@ -119,7 +162,112 @@ export default {
       name: "",
       description: "",
       parentDeviceType: "Laptop",
-      description: ""
+      test: 
+[
+    {
+      "id": 1,
+      "name": "RACUNAR",
+      "parentid": null,
+      "description": "RACUNAR PARENT 0",
+      "properties": [
+        {
+          "nameProperty": "cpu",
+          "required": true,
+          "type": "Text"
+        },
+        {
+          "nameProperty": "ram",
+          "required": false,
+          "type": "Text"
+        }
+      ],
+      "children": [
+        {
+          "id": 2,
+          "name": "LAPTOP",
+          "parentid": 1,
+          "description": "Basic Laptop",
+          "properties": [
+            {
+              "nameProperty": "touchpad",
+              "required": false,
+              "type": "Text"
+            }
+          ],
+          "children": [
+            {
+              "id": 3,
+              "name": "ULTRA - LAPTOP",
+              "parentid": 2,
+              "description": "ULTRA LAGAN",
+              "properties": [
+                {
+                  "nameProperty": "weight",
+                  "required": true,
+                  "type": "Text"
+                }
+              ],
+              "children": [
+                {
+                  "id": 4,
+                  "name": "Air Book",
+                  "parentid": 3,
+                  "description": "Microsoft Air Book",
+                  "properties": [
+                    {
+                      "nameProperty": "size",
+                      "required": true,
+                      "type": "input"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 7,
+              "name": "Standard Laptop",
+              "parentid": 2,
+              "description": "Standardni laptop",
+              "properties": [
+                {
+                  "nameProperty": "price",
+                  "required": true,
+                  "type": "Text"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "name": "Desktop",
+          "parentid": 1,
+          "description": "Home desktop PC",
+          "properties": [
+            {
+              "nameProperty": "Case",
+              "required": true,
+              "type": "Label"
+            }
+          ]
+        },
+        {
+          "id": 6,
+          "name": "Server",
+          "parentid": 1,
+          "description": "Firewall",
+          "properties": [
+            {
+              "nameProperty": "Housing",
+              "required": true,
+              "type": "Label"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+  
     };
   }
 };

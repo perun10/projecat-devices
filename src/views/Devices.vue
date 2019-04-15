@@ -5,7 +5,7 @@
         <button type="button" class="btn btn-primary" @click="pushToNewDevice">New device</button>
       </v-flex>
     </v-layout>
-    <v-data-table :headers="header" :items="devices" class="elevation-1" >
+    <v-data-table :headers="header" :items="devices" class="elevation-1" item-key="name" >
       <template v-slot:items="props">
         <template v-for="it in props.item.data.result">
           <tr :key="it.index">

@@ -19,7 +19,7 @@
           <p v-if="message" style="color:red;">SELECTE DEVICE TYPE</p>
         </v-layout>
         <v-layout row wrap justify-space-around>
-          <v-btn color="transparent">Cancel</v-btn>
+          <v-btn color="transparent" @click="close">Cancel</v-btn>
           <v-btn color="info" @click="next">Next</v-btn>
         </v-layout>
       </v-stepper-content>
@@ -63,8 +63,9 @@
                             <!-- {{index}} :
                                  {{item}} 
                             {{index2}}               --> 
-                            <component :is="item.type" :id="index+item.type+index2" @blur="take(index,index+item.type+index2,item.nameProperty,index2)"/> 
-                           
+                            <!-- <component :is="item.type" :id="index+item.type+index2" @blur="take(index,index+item.type+index2,item.nameProperty,index2)"/>  -->
+                           <component :is="item.type" @change="take2(item.nameProperty)"/>
+                           <p style="color:red;" v-if="message&&item.required">{{paragraph}}</p>
                           </div>
                       
                         </div>
@@ -80,8 +81,8 @@
             </v-flex>
           </v-layout>
           <v-layout row wrap justify-center>
-            <v-btn color="error">Cancel</v-btn>
-            <v-btn color="warning">Back</v-btn>
+            <v-btn color="error" @click="close">Cancel</v-btn>
+            <v-btn color="warning" @click="tab='newDevice'">Back</v-btn>
             <v-btn color="info" @click="createNewDevice">Save</v-btn>
             <!-- {{newDevicesValues}} -->
           </v-layout>
@@ -101,8 +102,16 @@ export default {
     if (!this.$store.getters.deviceTypes) {
       this.$store.dispatch("getDeviceTypes");
     }
-  },
+  }, 
   methods: {  
+    take2(name){
+      console.log(name)
+      let newValue = event.target.value;
+      if(newValue){
+        this.newDevicesValues.push({propName:name,value:newValue})
+      }
+
+    },
     take(index1 , value , nameProp , index2){
       console.log(value)
       let newValue = document.getElementById(value).value
@@ -110,11 +119,14 @@ export default {
       this.newDevicesValues.push({propName:nameProp,value: newValue})
     },
     createNewDevice() {
+      var msg = ''
       // console.log(this.name + "-" + this.description);
-      // console.log(this.newDevicesValues)
-       var newDev = {}
+      // console.log(this.newDevicesValues) --- devicetypeProperties
+      if(this.newDevicesValues){
+     var newDev = {}
+      // this.message = false
         this.newDevicesValues.forEach(item =>{
-
+          msg = item.propName
       
       newDev = {
          deviceName : this.name,
@@ -136,19 +148,23 @@ export default {
         then(()=>{
           this.$router.push('/devices')
         })
-        
+      }else{
+        this.message = true
+        this.paragraph = 'Value needed' 
+      }
+       
     },
     next() {
       if (this.parentId) {
         this.message = false;
-        this.$store.dispatch("getDeviceTypeProperties", this.parentId);
+        this.$store.dispatch("getDeviceTypeProperties", this.parentId)
         this.tab = "newProperties";
       } else {
         this.message = true;
       }
     },
     close() {
-      this.$router.push("/");
+      this.$router.push("/devices");
     }
   },
   computed: {
@@ -208,7 +224,8 @@ export default {
       active: null,
       selectedValue: [],
       items2: ["MM", "RR"],
-      test: ""
+      test: "",
+      paragraph:''
     };
   }
 };

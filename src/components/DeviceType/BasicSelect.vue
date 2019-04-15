@@ -1,38 +1,15 @@
 <template>
-  <div>
-    <!-- <select v-for="item in flatted" :key="item.id">
-    <option>{{item.name}}</option>
-    </select>-->
-    <DropDownTree
-      :data-source="data"
-      :data-text-field="['name']"
-      :scheme-model-hasChildren="'children'"
-      :scheme-model-children="'items'"
-      @change="onChange"
-      :placeholder="'Select device type parent...'"
-      style="width: 300px;"
-    ></DropDownTree>
-<!-- {{selectedDeviceTypeId}} -->
-<!-- <v-btn @click="flatten(data)">FLAT</v-btn> -->
-    <!-- {{localDataSource.options}} -->
-    <!-- {{data[0].children[1]}} -->
-    <!-- <BasicSelect v-for="child in data"
-            :data="child"
-    :key="child.index"/>-->
-    <!-- <v-select :items="flatted" :item-value="flatted" :placeholder="flatted.name"></v-select> -->
-    <!-- <select v-model="test">
-<option v-for="flat in flatted" :key="flat.id" :value="flat.id">{{flat.name}}</option>
-    </select>-->
-    <!-- localDataSource: new kendo.data.HierarchicalDataSource({
-        data: this.data,
-        schema:{
-          model:{
-            hasChildren: 'children',
-            children: this.data[0].children[0].name
-          }
-        }
-    })-->
-  </div>
+    <div>
+      <DropDownTree
+          :data-source="data"
+          :data-text-field="['name']"
+          :scheme-model-hasChildren="'children'"
+          :scheme-model-children="'items'"
+          @change="onChange"
+          :placeholder="placeholder"
+          style="width: 300px;"
+        ></DropDownTree>
+    </div>
 </template>
 
 <script>
@@ -44,7 +21,7 @@ import {
 } from "@progress/kendo-dropdowntree-vue-wrapper";
 export default {
   name: "BasicSelect",
-  props: ["data"],
+  props: ["data", "placeholder"],
   components: {
     DropDownTree
   },
