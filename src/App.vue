@@ -9,6 +9,7 @@
 
     <v-content>
       <router-view></router-view>
+       <Loader/>
     </v-content>
   </v-app>
 </template>

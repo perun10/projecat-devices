@@ -5,7 +5,7 @@
         <button type="button" class="btn btn-primary" @click="pushToNewDeviceType">New device type</button>
       </v-flex>
     </v-layout>
-    <treeview :data="deviceTypes"/>
+    <treeview :data="deviceTypes" v-if="deviceTypes"/>
 
   </v-container>
 </template>

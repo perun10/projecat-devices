@@ -133,7 +133,7 @@ export default {
         this.error = true;
       }
     },
-    async editDeviceType() {
+     editDeviceType() {
         // console.log(this.activeDeviceType)
         // console.log(this.activeDeviceType.name)
         // console.log(this.activeDeviceType.description)
@@ -150,9 +150,9 @@ export default {
           "description": this.description
       }
 
-      await this.$store.dispatch('createNewDeviceType', deviceTypeData);
-      await this.$store.commit('setDeviceTypeName', this.name);
-      await this.$emit('clicked', 'builder');
+       this.$store.dispatch('createNewDeviceType', deviceTypeData);
+       this.$store.commit('setDeviceTypeName', this.name);
+       this.$emit('clicked', 'builder');
     },
     goBack() {
       this.$emit("clicked", "builder");

@@ -1,27 +1,27 @@
 <template>
   <v-container grid-list-xs>
-    <v-stepper v-model="tab">
+    <v-stepper :value="tabLocation">
       <v-stepper-header>
-        <v-stepper-step :complete="tab==='newProperties'" step="1">
+        <v-stepper-step :complete="tabLocation==='newProperties'" step="1">
           <small>Step 1</small>
           Device Type
         </v-stepper-step>
         <v-divider></v-divider>
-        <v-stepper-step :complete="tab==='completed'" step="2">
+        <v-stepper-step :complete="tabLocation==='completed'" step="2">
           <small>Step 2</small>
           Properties
         </v-stepper-step>
       </v-stepper-header>
 
       <v-stepper-content step="newDevice">
-        <TreeView :data="deviceTypes" :newDeviceType="false"/>
+        <TreeView :data="deviceTypes" :newDeviceType="false" v-if="deviceTypes"/>
         <v-layout row wrap justify-center>
           <p v-if="message" style="color:red;">SELECTE DEVICE TYPE</p>
         </v-layout>
-        <v-layout row wrap justify-space-around>
+        <!-- <v-layout row wrap justify-space-around>
           <v-btn color="transparent" @click="close">Cancel</v-btn>
           <v-btn color="info" @click="next">Next</v-btn>
-        </v-layout>
+        </v-layout>-->
       </v-stepper-content>
 
       <v-stepper-content step="newProperties">
@@ -29,21 +29,7 @@
           <v-layout row wrap>
             <v-flex xs12>
               <template>
-                <v-layout row wrap>
-                  <v-flex xs12>
-                    <v-card>
-                      <v-card-text style="background-color:lightgrey;">
-                        <h6>"Device" properties</h6>
-                      </v-card-text>
-                      <v-card-text>
-                        <v-text-field label="Regular" placeholder="Placeholder" v-model="name"></v-text-field>
-
-                        <v-textarea box name="input-7-4" label="Description" v-model="description"></v-textarea>
-                      </v-card-text>
-                    </v-card>
-                  </v-flex>
-                </v-layout>
-                <v-expansion-panel class="p-3">
+                <v-expansion-panel class="p-3" :expand="true">
                   <v-expansion-panel-content
                     v-for="(item, index) in devicetypeProperties"
                     :key="index"
@@ -54,20 +40,22 @@
                     <v-card>
                       <v-card-text v-if="item.properties.length">
                         <!-- <p class="propertyDescription">{{ item.description }}</p> -->
-                        <div v-for="(item, index2) in item.properties" :key="index2">
+                        <div v-for="(item1, index2) in item.properties" :key="index2">
                           <div class="propertyBody">
                             <p>
-                              {{ item.nameProperty }}
-                              <span v-if="item.required" class="required">*</span>
+                              {{ item1.nameProperty }}
+                              <span v-if="item1.required" class="required">*</span>
                             </p>
+                            <!-- {{item}}  -->
                             <!-- {{index}} :
-                                 {{item}} 
-                            {{index2}}               --> 
+                            {{index2}}-->
                             <!-- <component :is="item.type" :id="index+item.type+index2" @blur="take(index,index+item.type+index2,item.nameProperty,index2)"/>  -->
-                           <component :is="item.type" @change="take2(item.nameProperty)"/>
-                           <p style="color:red;" v-if="message&&item.required">{{paragraph}}</p>
+                            <component
+                              :is="item1.type"
+                              @change="take2(item.id,item1.nameProperty)"
+                            />
+                            <p style="color:red;" v-if="message&&item1.required">{{paragraph}}</p>
                           </div>
-                      
                         </div>
                       </v-card-text>
                       <v-card-text v-else>
@@ -76,16 +64,46 @@
                     </v-card>
                   </v-expansion-panel-content>
                 </v-expansion-panel>
+                <v-layout row wrap>
+                  <v-flex xs12>
+                    <v-card>
+                      <v-card-text style="background-color:lightgrey;">
+                        <h6>"Device" properties</h6>
+                      </v-card-text>
+                      <v-card-text>
+                        <v-form v-model="valid">
+                          <v-text-field
+                            v-model="name"
+                            :rules="nameRules"
+                            :counter="10"
+                            label="Name"
+                            required
+                          ></v-text-field>
+
+                          <v-textarea
+                            box
+                            name="input-7-4"
+                            label="Description"
+                            v-model="description"
+                            :rules="descripRules"
+                            required
+                          ></v-textarea>
+                        </v-form>
+                      </v-card-text>
+                    </v-card>
+                  </v-flex>
+                </v-layout>
               </template>
               <v-layout row wrap></v-layout>
             </v-flex>
           </v-layout>
           <v-layout row wrap justify-center>
             <v-btn color="error" @click="close">Cancel</v-btn>
-            <v-btn color="warning" @click="tab='newDevice'">Back</v-btn>
+            <v-btn color="warning" @click="back">Back</v-btn>
             <v-btn color="info" @click="createNewDevice">Save</v-btn>
-            <!-- {{newDevicesValues}} -->
           </v-layout>
+
+          <!-- {{newDevicesValues}} -->
         </v-container>
       </v-stepper-content>
     </v-stepper>
@@ -102,62 +120,72 @@ export default {
     if (!this.$store.getters.deviceTypes) {
       this.$store.dispatch("getDeviceTypes");
     }
-  }, 
-  methods: {  
-    take2(name){
-      console.log(name)
+  
+  },
+  beforeDestroy() {
+    this.$store.commit("setTabLocation", "newDevice");
+    this.$store.commit("setDeviceTypeId", null);
+  },
+  created() {
+      console.log(this.tabLocation)
+    if(this.tabLocation){
+    this.tab = this.tabLocation
+    }
+  },
+  methods: {
+    take2(id, name) {
+      let checkIndex = this.newDevicesValues.map(e=> {return e.id}).indexOf(id)
+      // console.log(id);
       let newValue = event.target.value;
-      if(newValue){
-        this.newDevicesValues.push({propName:name,value:newValue})
+      if (checkIndex === -1) {
+        let newObj = {
+          id: id,
+          propValues: [{ propName: name, value: newValue }]
+        };
+        this.newDevicesValues.push(newObj);
+      }else{        
+          this.newDevicesValues[checkIndex].propValues.push({ propName: name, value: newValue })
       }
-
     },
-    take(index1 , value , nameProp , index2){
-      console.log(value)
-      let newValue = document.getElementById(value).value
+    take(index1, value, nameProp, index2) {
+      console.log(value);
+      let newValue = document.getElementById(value).value;
       // console.log(index1,newValue,index2)
-      this.newDevicesValues.push({propName:nameProp,value: newValue})
+      this.newDevicesValues.push({ propName: nameProp, value: newValue });
     },
     createNewDevice() {
-      var msg = ''
-      // console.log(this.name + "-" + this.description);
-      // console.log(this.newDevicesValues) --- devicetypeProperties
-      if(this.newDevicesValues){
-     var newDev = {}
+      var msg = "";
+      console.log(this.name + "-" + this.description);
+      console.log(this.newDevicesValues); // --- devicetypeProperties
+
+      var newDev = {};
       // this.message = false
-        this.newDevicesValues.forEach(item =>{
-          msg = item.propName
-      
+      var newArr = [];
+      this.newDevicesValues.forEach(item => {
+        newArr.push({ propName: item.propName, value: item.value });
+      });
+
       newDev = {
-         deviceName : this.name,
-         description: this.description,
-         id:0,
-         deviceTypes:[
-           {id:this.parentId,
-            propValues:[
-              {propName : item.propName,
-                value:item.value
-              }
-            ]
-           }
-         ]
-      }
-        })
-        console.log(newDev)
-        this.axios.post("http://localhost:21021/api/services/app/DeviceService/CreateOrUpdateDevice",newDev).
-        then(()=>{
-          this.$router.push('/devices')
-        })
-      }else{
-        this.message = true
-        this.paragraph = 'Value needed' 
-      }
-       
+        deviceName: this.name,
+        description: this.description,
+        id: 0,
+        deviceTypes: this.newDevicesValues
+      };
+
+      console.log(newDev);
+      this.axios
+        .post(
+          "http://localhost:21021/api/services/app/DeviceService/CreateOrUpdateDevice",
+          newDev
+        )
+        .then(() => {
+          this.$router.push("/devices");
+        });
     },
     next() {
       if (this.parentId) {
         this.message = false;
-        this.$store.dispatch("getDeviceTypeProperties", this.parentId)
+        this.$store.dispatch("getDeviceTypeProperties", this.parentId);
         this.tab = "newProperties";
       } else {
         this.message = true;
@@ -165,9 +193,15 @@ export default {
     },
     close() {
       this.$router.push("/devices");
+    },
+    back() {
+      this.$store.commit("setTabLocation", "newDevice");
     }
   },
   computed: {
+    tabLocation() {
+      return this.$store.getters.tabLocation;
+    },
     deviceTypes() {
       return this.$store.getters.deviceTypes;
     },
@@ -180,7 +214,16 @@ export default {
   },
   data() {
     return {
-      newDevicesValues:[],
+      valid: false,
+      nameRules: [
+        v => !!v || "Name is required",
+        v => v.length <= 10 || "Name must be less than 10 characters"
+      ],
+      descripRules: [
+        v => !!v || "Description is required",
+        v => v.length >= 10 || "Description must be more than 10 characters"
+      ],
+      newDevicesValues: [],
       newDevice: [
         {
           deviceName: "HP Laptop",
@@ -225,7 +268,7 @@ export default {
       selectedValue: [],
       items2: ["MM", "RR"],
       test: "",
-      paragraph:''
+      paragraph: ""
     };
   }
 };

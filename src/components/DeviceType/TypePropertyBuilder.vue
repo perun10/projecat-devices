@@ -2,12 +2,12 @@
     <div>
         <v-layout row wrap grid-list-xs text-xs-center>
             <v-flex xs8  v-if="activeDeviceType">
-                <div class="property newDevice">
+                 <div class="property newDevice">
                     <p class="propertyHeader">"{{ activeDeviceType.name }}" properties</p>
                     <draggable
                         class="list-group"
                         :list="properties"
-                        group="a"
+                        :options="{group:{ name:'a', pull:'clone'}, sort: false }"
                         draggable=".item"
                         @change="newModal(activeType)">
                             <div
@@ -37,7 +37,8 @@
 
             <!-- dragable 2 -->
             <v-flex xs4 class="border">
-                <draggable id="first" data-source="juju" :value="myArray" group="a">
+                <draggable id="first" data-source="juju" :value="myArray"
+                     :options="{group:{ name:'a', pull:'clone'}, sort: false}">
                     <div @mousedown="activeType = element.type"
                         class="list-group-item item"
                         v-for="(element,index) in myArray"

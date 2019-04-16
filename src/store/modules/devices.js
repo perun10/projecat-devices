@@ -2,7 +2,8 @@ import axios from 'axios'
 
 const state = {   
     devices:null,
-    selectedDeviceTypeID:null   
+    selectedDeviceTypeID:null   ,
+    tab: 'newDevice'
 };
 
 const mutations = {   
@@ -11,6 +12,9 @@ const mutations = {
     },
     setDeviceTypeId(state,payload){
         state.selectedDeviceTypeID = payload
+    },
+    setTabLocation(state,payload){
+        state.tab = payload
     }
 };
 
@@ -22,6 +26,22 @@ const actions = {
           commit('setDevices', data);
         })
     },
+    deleteDevice({ commit, dispatch }, payload) {
+        commit('setLoader', true);
+        axios.delete('http://localhost:21021/api/services/app/DeviceService/DeleteDevice', {
+            params: {
+                id: payload.id
+            }
+        })
+        .then(()=>{
+            dispatch('getDevices');
+            commit('setLoader', false);
+        })
+        .catch(error=>{
+            console.log(error.message);
+            commit('setLoader', false);
+        }) 
+    }
 
 };
 
@@ -31,6 +51,9 @@ const getters = {
     },
     selectedIdType(state){
         return state.selectedDeviceTypeID
+    },
+    tabLocation(state){
+        return state.tab
     }
 };
 

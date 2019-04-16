@@ -5,7 +5,8 @@
           :data-text-field="['name']"
           :scheme-model-hasChildren="'children'"
           :scheme-model-children="'items'"
-          @change="onChange"         
+          @change="onChange"   
+          placeholder="Select parent type"      
           style="width: 300px;"
         ></DropDownTree>
     </div>

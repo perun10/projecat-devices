@@ -1,7 +1,8 @@
 <template>
     <div>
+    <!-- delete device type prompt -->
     <v-layout row justify-center>
-        <v-dialog v-model="show" max-width="600px" v-if="activeDevType">
+        <v-dialog v-model="show" max-width="600px" v-if="mode === 'deleteDeviceType'">
         <v-card>
             <v-card-title>
                 <span class="headline">Are you sure you want to delete <span>{{ activeDevType.name }}</span> device type?</span>
@@ -26,12 +27,30 @@
         </v-card>
         </v-dialog>
     </v-layout>
+
+    <!-- delete device prompt -->
+    <v-layout row justify-center>
+        <v-dialog v-model="show" max-width="600px" v-if="mode === 'deleteDevice'">
+        <v-card>
+            <v-card-title>
+                <span class="headline">Are you sure you want to delete <span>{{ activeDevice.name }}</span> device type?</span>
+            </v-card-title>
+            <v-layout justify-center>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="blue darken-1" flat @click.stop="onDeleteDevice" class="modalButton">Confirm</v-btn>
+                    <v-btn color="blue darken-1" flat @click.stop="show = false" class="modalButton">Cancel</v-btn>
+                </v-card-actions>
+            </v-layout>
+        </v-card>
+        </v-dialog>
+    </v-layout>
     </div>
 </template>
 
 <script>
 export default { 
-    props: ['visible', 'activeDevType'],
+    props: ['visible', 'activeDevType', 'activeDevice', 'mode'],
     data() {
         return {
             dialog: false
@@ -56,6 +75,11 @@ export default {
         onConfirm() {
             let id = this.activeDevType.id;
             this.$store.dispatch("deleteDeviceType", { id: id });
+            this.$emit('close');
+        },
+        onDeleteDevice() {
+            let id = this.activeDevice.id;
+            this.$store.dispatch("deleteDevice", { id: id });
             this.$emit('close');
         }
     }
