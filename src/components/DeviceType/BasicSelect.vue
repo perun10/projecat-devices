@@ -5,8 +5,7 @@
           :data-text-field="['name']"
           :scheme-model-hasChildren="'children'"
           :scheme-model-children="'items'"
-          @change="onChange"
-          :placeholder="placeholder"
+          @change="onChange"         
           style="width: 300px;"
         ></DropDownTree>
     </div>
@@ -21,7 +20,7 @@ import {
 } from "@progress/kendo-dropdowntree-vue-wrapper";
 export default {
   name: "BasicSelect",
-  props: ["data", "placeholder"],
+  props: ["data"],
   components: {
     DropDownTree
   },

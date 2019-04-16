@@ -159,7 +159,7 @@ export default {
     created() {
         if(this.editMode) {
             this.properties = this.deviceTypePropertyField;
-            this.properties.forEach((property, i) => {
+            this.properties.forEach((property, i) => {             
                 property.localID = i;
             });
         }
