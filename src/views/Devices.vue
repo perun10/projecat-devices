@@ -5,17 +5,19 @@
        <button type="button" class="btn btn-primary" @click="pushToNewDevice">New device</button>
      </v-flex>
    </v-layout>
-   <v-data-table :headers="header" :items="devices" class="elevation-1" item-key="name">
+   <v-data-table :headers="header" :items="devices" class="elevation-1" item-key="name" v-if="devices">
      <template v-slot:items="props">
-       <template v-for="it in props.item.data.result">
-         <tr :key="it.index">
-           <td class="text-left">{{it.name}}</td>
-           <td class="text-center">{{it.deviceTypeName}}</td>
-           <td class="text-right">{{it.description}}</td>
+    
+      
+         <tr>
+           <td class="text-left">{{props.item.name}}</td>
+           <td class="text-center">{{props.item.deviceTypeName}}</td>
+           <td class="text-right">{{props.item.description}}</td>
            <!-- <td class="text-right" @click="onEdit(it)">Edit</td> -->
-           <td class="text-right td-button" @click="onDelete(it)">Delete</td>
+           <td class="text-right td-button btn-link" @click="onDelete(props.item)">Delete</td>
          </tr>
-       </template>
+     
+    
      </template>
    </v-data-table>
    <prompt :visible="dialogVisible" :activeDevice="activeDevice" @close="onClose" :mode="mode"></prompt>
@@ -25,6 +27,7 @@
 <script>
 import Prompt from "@/components/shared/Prompt";
 import {store} from '@/store/store'
+import { setTimeout } from 'timers';
 
 export default {
    components: {
@@ -32,6 +35,7 @@ export default {
    },
  data() {
    return {
+     
      myDevs:[],
      active: "",
      itemKey: [],
@@ -65,21 +69,60 @@ export default {
      ],
      activeDevice: [],
      dialogVisible: false,
-     mode: ''
+     mode: '',
+     data:[
+    {
+      "id":1,
+      "name":"RACUNAR",
+      "parentid":null,
+      "description":"OPIS",
+      "items":[
+        {"nameProperty":"cpu","required":true,"type":"Text"},
+        {"nameProperty":"ram","required":false,"type":"Text"}
+      ]
+    },
+    {
+      "id":2,
+      "name":"LAPTOP",
+      "parentid":1,
+      "description":"OPIS",
+      "items":[{"nameProperty":"touchpad","required":false,"type":"Text"}]
+    },
+    {
+      "id":3,
+      "name":"ULTRA - LAPTOP",
+      "parentid":2,
+      "description":"ULTRA LAGAN",
+      "items":[
+        {"nameProperty":"weight","required":true,"type":"Text"},
+        {"nameProperty":"boja","required":true,"type":"zelena"}
+      ]
+    },
+    {
+      "id":4,
+      "name":"Ultra Book",
+      "items":[{"nameProperty":"tezina","required":true,"type":"Text"}]
+    }
+   ]
+  
    };
  },
  beforeRouteEnter(to,from,next) {
-  store.dispatch("getDevices");  
+   store.commit('setLoader',true)
+  store.dispatch("getDevices");
+  setTimeout(()=>{
    next();
+  },100)  
+   
  },
- created(){
-  //  this.myDevs = this.devices
+ mounted(){
+    this.$store.commit('setLoader',false)
  },
  computed: {
    devices() {
      let arr = [];
      // return this.$store.getters.devices
-     arr.push(this.$store.getters.devices);
+     arr = this.$store.getters.devices.data.result;
      // console.log(arr)
      return arr;
    }

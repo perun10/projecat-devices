@@ -29,6 +29,35 @@
           <v-layout row wrap>
             <v-flex xs12>
               <template>
+                <v-layout row wrap>
+                  <v-flex xs12>
+                    <v-card>
+                      <v-card-text style="background-color:lightgrey;">
+                        <h6>"Device" properties</h6>
+                      </v-card-text>
+                      <v-card-text>
+                        <v-form v-model="valid">
+                          <v-text-field
+                            v-model="name"
+                            :rules="nameRules"
+                            :counter="20"
+                            label="Name"
+                            required
+                          ></v-text-field>
+
+                          <v-textarea
+                            box
+                            name="input-7-4"
+                            label="Description"
+                            v-model="description"
+                            :rules="descripRules"
+                            required
+                          ></v-textarea>
+                        </v-form>
+                      </v-card-text>
+                    </v-card>
+                  </v-flex>
+                </v-layout>
                 <v-expansion-panel class="p-3" :expand="true">
                   <v-expansion-panel-content
                     v-for="(item, index) in devicetypeProperties"
@@ -64,35 +93,7 @@
                     </v-card>
                   </v-expansion-panel-content>
                 </v-expansion-panel>
-                <v-layout row wrap>
-                  <v-flex xs12>
-                    <v-card>
-                      <v-card-text style="background-color:lightgrey;">
-                        <h6>"Device" properties</h6>
-                      </v-card-text>
-                      <v-card-text>
-                        <v-form v-model="valid">
-                          <v-text-field
-                            v-model="name"
-                            :rules="nameRules"
-                            :counter="10"
-                            label="Name"
-                            required
-                          ></v-text-field>
-
-                          <v-textarea
-                            box
-                            name="input-7-4"
-                            label="Description"
-                            v-model="description"
-                            :rules="descripRules"
-                            required
-                          ></v-textarea>
-                        </v-form>
-                      </v-card-text>
-                    </v-card>
-                  </v-flex>
-                </v-layout>
+                
               </template>
               <v-layout row wrap></v-layout>
             </v-flex>
@@ -127,7 +128,7 @@ export default {
     this.$store.commit("setDeviceTypeId", null);
   },
   created() {
-      console.log(this.tabLocation)
+      // console.log(this.tabLocation)
     if(this.tabLocation){
     this.tab = this.tabLocation
     }

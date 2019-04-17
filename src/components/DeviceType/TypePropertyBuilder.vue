@@ -1,7 +1,40 @@
 <template>
     <div>
         <v-layout row wrap grid-list-xs text-xs-center>
-            <v-flex xs8  v-if="activeDeviceType">
+            <v-flex xs8>
+                 
+                <v-expansion-panel class="p-3" :expand="true">
+                  <v-expansion-panel-content
+                    v-for="(item, index) in deviceTypesProperties"
+                    :key="index"
+                  >
+                    <template v-slot:header>
+                      <div>{{item.name}} properties</div>
+                    </template>
+                    <v-card>
+                      <v-card-text v-if="item.properties.length">
+                        <!-- <p class="propertyDescription">{{ item.description }}</p> -->
+                        <div v-for="(item1, index2) in item.properties" :key="index2">
+                          <div class="propertyBody">
+                            <p>
+                              {{ item1.nameProperty }}
+                              <span v-if="item1.required" class="required">*</span>
+                            </p>
+                            <!-- {{item}}  -->
+                            <!-- {{index}} :
+                            {{index2}}-->
+                            <!-- <component :is="item.type" :id="index+item.type+index2" @blur="take(index,index+item.type+index2,item.nameProperty,index2)"/>  -->
+                             <p>{{ item.nameProperty }} <span v-if="item.required" class="required">*</span></p>
+                                <component :is="item1.type" type="text" disabled class="disabledField"></component>
+                          </div>
+                        </div>
+                      </v-card-text>
+                      <v-card-text v-else>
+                        <h3>No properties</h3>
+                      </v-card-text>
+                    </v-card>
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
                  <div class="property newDevice">
                     <p class="propertyHeader">"{{ activeDeviceType.name }}" properties</p>
                     <draggable
@@ -14,25 +47,24 @@
                                 class="list-group-item item"
                                 v-for="(element, index) in properties"
                                 :key="index">
-                                    <p>{{ element.nameProperty }} <span v-if="element.required" class="required">*</span></p>
+                                <v-layout row wrap justify-space-around>
+                                    <p class="pl-5">{{ element.nameProperty }} <span v-if="element.required" class="required">*</span></p>
+                                    <a @click="openModal(element.localID, element.type)">
+                                        <img class="svgLinkBtn" src="@/assets/settings.svg" alt="">
+                                    </a>
+                                    
+                                </v-layout>
+                                <v-layout row wrap justify-space-between="">
                                     <component :is="element.type" disabled class="disabledField"/> 
-                                    <v-btn color="success" class="btn-save" @click="openModal(element.localID, element.type)">X</v-btn>
-                                    <v-btn color="red" class="btn-save" @click="deleteProperty(element.localID)">X</v-btn>
+                                    
+                                    <a color="red"  @click="deleteProperty(element.localID)">X</a>
+                                    
+                                </v-layout>
                             </div>
                     </draggable>
                 </div>
 
-                <div v-for="(item, index) in deviceTypesProperties" :key="index">
-                    <div class="property" v-if="item.name !== activeDeviceType.name">
-                        <p class="propertyHeader">"{{ item.name }}" properties</p>
-                        <div v-for="(item, index) in item.properties" :key="index">
-                            <div class="propertyBody">
-                                <p>{{ item.nameProperty }} <span v-if="item.required" class="required">*</span></p>
-                                <component :is="item.type" type="text" disabled class="disabledField"></component>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+               
             </v-flex>
 
             <!-- dragable 2 -->
@@ -154,8 +186,11 @@ export default {
         }
 
     },
-    mounted(){
-    
+    beforeDestroy(){
+                  this.$store.commit('setNewDeviceTypeProperties',null)
+                        this.$store.commit('setSelectedDeviceTypeId',null)
+
+
     },
     created() {
         if(this.editMode) {
@@ -238,28 +273,47 @@ export default {
             this.dialog = false;
         },
         cancel() {
+    this.$store.commit('setNewDeviceTypeProperties',null)
+          this.$store.commit('setSelectedDeviceTypeId',null)
+
+             this.$router.push('/')
           if(!this.editMode){
           // console.log(this.activeDeviceType.id)
-          this.$store.dispatch('deleteDeviceType',{id:this.activeDeviceType.id})
-            this.$router.push("/");
+         // this.$store.dispatch('deleteDeviceType',{id:this.activeDeviceType.id})
+            //this.$router.push("/");
           }else{
-            this.$router.push("/");
+           // this.$router.push("/");
 
           }
         },
         goBack() {
-            this.$store.commit('setEditMode', true);
+          //  this.$store.commit('setEditMode', true);
+          this.$store.commit('setNewDeviceTypeProperties',null)
+                this.$store.commit('setSelectedDeviceTypeId',null)
+
             this.$emit("clicked", "info");
         },
         onSave() {
+            console.log(this.properties)
             this.properties.forEach(property => delete property.localID);
             const data = {
+                name:this.activeDeviceType.name,
+                description:this.activeDeviceType.description,
+                parentId:this.activeDeviceType.parentId,
                 properties: this.properties,
-                id: this.activeDeviceTypeID
+             //   id: this.activeDeviceTypeID
             };
-            this.axios.post('http://localhost:21021/api/services/app/DeviceTypeService/CreateOrUpdateProperties', data)
-                .then(response => console.log(response));
-            this.$router.push('/');
+            console.log(data)
+            this.$store.dispatch('createNewDeviceType',data).then(()=>{
+                this.$store.commit('setLoader', true);
+                setTimeout(() => {
+                    this.$router.push('/')
+                    
+                }, 100)
+                this.$store.dispatch('getDeviceTypes')
+            this.$store.commit('setLoader',false)
+            })
+           
         }
     }
 };
@@ -334,7 +388,11 @@ export default {
         min-height: 120px;
     }
 
-    .disabledField {
-        background-color: rgb(248, 248, 248);
+    .disabledField {      
+        border: 1px solid black;
+        background-color:lightgray;
+    }
+    .svgLinkBtn{
+        width: 30px;
     }
 </style>

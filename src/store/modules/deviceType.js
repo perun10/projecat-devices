@@ -1,5 +1,4 @@
 import axios from 'axios'
-
 const state = {
     deviceTypes: null,
     newDeviceTypeProperties: null,
@@ -50,15 +49,19 @@ const actions = {
         })
     },
     createNewDeviceType({ commit }, payload) {
-        commit('setLoader', true);
-        axios.post('http://localhost:21021/api/services/app/DeviceTypeService/CreateOrUpdateDeviceType', payload)
-        .then((response) => {
-            let data = response.data.result;
-            commit('setNewDeviceTypeProperties', data);
-            commit('setActiveDeviceTypeID', data[data.length-1].id);
-            commit('setActiveDeviceType', data[data.length-1]);
-            commit('setLoader', false);
-        })
+            console.log(payload)
+            axios.post('http://localhost:21021/api/services/app/DeviceTypeService/CreateOrUpdateDeviceType', payload)
+            .then(response => 
+                console.log(response));
+             //router.push('/');
+             commit('setLoader',false)
+        // axios.post('http://localhost:21021/api/services/app/DeviceTypeService/CreateOrUpdateDeviceType', payload)
+        // .then((response) => {
+        //     let data = response.data.result;
+        //     commit('setNewDeviceTypeProperties', data);
+        //     commit('setActiveDeviceTypeID', data[data.length-1].id);
+          //  commit('setActiveDeviceType', payload);
+        // })
     },
     deleteDeviceType({commit, dispatch},payload){
         commit('setLoader', true);
@@ -78,6 +81,7 @@ const actions = {
 
     },
     getDeviceTypeProperties({commit},payload){
+        if(payload){
         commit('setLoader', true);
         axios.get('http://localhost:21021/api/services/app/DeviceTypeService/GetDeviceTypesWithProperties',{
             params: {
@@ -91,6 +95,7 @@ const actions = {
         }
             )
     }
+}
 };
 
 const getters = {

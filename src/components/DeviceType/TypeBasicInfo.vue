@@ -3,7 +3,9 @@
     <form name="device-type">
       <div class="form-group">
         <label for="name">Name:</label>
-        <input id="name" class="form-control" type="text" title="Required field." v-model="name">
+        <input id="name" class="form-control" type="text" title="Required field." v-model.trim="name" >
+        <div class="errors" v-if="!$v.name.required">Field is required</div>
+        <div class="errors" v-if="!$v.name.minLength">Name must have at least {{$v.name.$params.minLength.min}} letters.</div>
       </div>
       <div class="form-group">
         <!--   -->
@@ -33,9 +35,17 @@
 
 <script>
 import BasicSelect from "@/components/DeviceType/BasicSelect.vue";
+import { required, minLength, maxLength } from 'vuelidate/lib/validators'
+
 export default {
   components: {
     BasicSelect
+  },
+  validations:{
+    name:{
+      required,
+      minLength: minLength(4)
+    }
   },
   beforeCreate() {
     if (!this.$store.getters.deviceTypes) {
@@ -44,7 +54,7 @@ export default {
   },
   beforeDestroy() {
     this.$store.commit('setEditMode', false);
-    this.$store.commit('setSelectedDeviceTypeId', null);
+    // this.$store.commit('setSelectedDeviceTypeId', null);
   },
   mounted(){
     // console.log(this.selectedId)
@@ -54,7 +64,7 @@ export default {
       this.name = this.activeDeviceType.name;
       this.description = this.activeDeviceType.description;
       this.placeholder = this.activeDeviceType.parentId;
-      this.$store.commit("setSelectedDeviceTypeId", this.placeholder);
+      //this.$store.commit("setSelectedDeviceTypeId", this.placeholder);
 
       this.editDeviceType()
     }
@@ -92,6 +102,10 @@ export default {
     }
   },
   methods: {
+    setName(value) {
+      this.name = value
+      this.$v.name.$touch()
+    },
     flatten(arr) {
       var final = [];
       var self = this;
@@ -105,33 +119,57 @@ export default {
       return final;
     },
     newDeviceType() {
-      if (this.name && this.description) {
-       let parentID = '';
-      this.selectedId === null ? parentID = null : parentID = this.selectedId
-        // console.log(parentID)
-        let arr = []
-        arr = this.flatted
-        // console.log(arr)
-        if(!arr.includes(this.name)){    
-        this.error = false
+      if(!this.$v.name.$invalid){
+        console.log(this.selectedId + ","+ this.name)
+        let parent = 0
+        this.selectedId === null ? parent = null : parent = this.selectedId
         let createDeviceType = {
-            "id": 0,
-            "parentid": parentID,
-            "name": this.name,
-            "description": this.description
+          "id":0,
+          "name":this.name,
+          "description":this.description,
+          "parentId":parent
         }
+        console.log(createDeviceType)
+       if(parent){
 
-        this.$store.dispatch('createNewDeviceType', createDeviceType)
-        this.$store.commit('setDeviceTypeName', this.name)
+         this.$store.dispatch('getDeviceTypeProperties', parent)
+       }
+      
+         
+        this.$store.commit('setActiveDeviceType', createDeviceType);
 
-        this.goBack();
-        }else{
-          this.msg = 'Name already exists'
-          this.error = true
-        }
-      } else {
-        this.error = true;
+        // this.$store.commit('setDeviceTypeName', createDeviceType)
+        //this.$store.dispatch('createNewDeviceType', createDeviceType)
+
+        this.goBack()
       }
+      // if (this.name && this.description) {
+      //  let parentID = '';
+      // this.selectedId === null ? parentID = null : parentID = this.selectedId
+      //   // console.log(parentID)
+      //   let arr = []
+      //   arr = this.flatted
+      //   // console.log(arr)
+      //   if(!arr.includes(this.name)){    
+      //   this.error = false
+      //   let createDeviceType = {
+      //       "id": 0,
+      //       "parentid": parentID,
+      //       "name": this.name,
+      //       "description": this.description
+      //   }
+
+      //   this.$store.dispatch('createNewDeviceType', createDeviceType)
+      //   this.$store.commit('setDeviceTypeName', this.name)
+
+      //   this.goBack();
+      //   }else{
+      //     this.msg = 'Name already exists'
+      //     this.error = true
+      //   }
+      // } else {
+      //   this.error = true;
+      // }
     },
      editDeviceType() {
         // console.log(this.activeDeviceType)
@@ -167,114 +205,8 @@ export default {
       arrNames: [],
       name: "",
       description: "",
-      parentDeviceType: "Laptop",
-      test: 
-[
-    {
-      "id": 1,
-      "name": "RACUNAR",
-      "parentid": null,
-      "description": "RACUNAR PARENT 0",
-      "properties": [
-        {
-          "nameProperty": "cpu",
-          "required": true,
-          "type": "Text"
-        },
-        {
-          "nameProperty": "ram",
-          "required": false,
-          "type": "Text"
-        }
-      ],
-      "children": [
-        {
-          "id": 2,
-          "name": "LAPTOP",
-          "parentid": 1,
-          "description": "Basic Laptop",
-          "properties": [
-            {
-              "nameProperty": "touchpad",
-              "required": false,
-              "type": "Text"
-            }
-          ],
-          "children": [
-            {
-              "id": 3,
-              "name": "ULTRA - LAPTOP",
-              "parentid": 2,
-              "description": "ULTRA LAGAN",
-              "properties": [
-                {
-                  "nameProperty": "weight",
-                  "required": true,
-                  "type": "Text"
-                }
-              ],
-              "children": [
-                {
-                  "id": 4,
-                  "name": "Air Book",
-                  "parentid": 3,
-                  "description": "Microsoft Air Book",
-                  "properties": [
-                    {
-                      "nameProperty": "size",
-                      "required": true,
-                      "type": "input"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "id": 7,
-              "name": "Standard Laptop",
-              "parentid": 2,
-              "description": "Standardni laptop",
-              "properties": [
-                {
-                  "nameProperty": "price",
-                  "required": true,
-                  "type": "Text"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": 5,
-          "name": "Desktop",
-          "parentid": 1,
-          "description": "Home desktop PC",
-          "properties": [
-            {
-              "nameProperty": "Case",
-              "required": true,
-              "type": "Label"
-            }
-          ]
-        },
-        {
-          "id": 6,
-          "name": "Server",
-          "parentid": 1,
-          "description": "Firewall",
-          "properties": [
-            {
-              "nameProperty": "Housing",
-              "required": true,
-              "type": "Label"
-            }
-          ]
-        }
-      ]
+      parentDeviceType: "Laptop",     
     }
-  ]
-  
-    };
   }
 };
 </script>
@@ -291,5 +223,9 @@ export default {
 
 #selectType {
   width: 140px;
+}
+.errors{
+  color:red;
+  background-color:none!important;
 }
 </style>

@@ -1,14 +1,15 @@
 <template>
     <div>
       <DropDownTree
-          :data-source="data"
+          :data-source="localDataSource"
           :data-text-field="['name']"
           :scheme-model-hasChildren="'children'"
           :scheme-model-children="'items'"
-          @change="onChange"   
+          v-model="comboBoxValue"          
           placeholder="Select parent type"      
           style="width: 300px;"
         ></DropDownTree>
+   
     </div>
 </template>
 
@@ -27,6 +28,10 @@ export default {
   },
   data() {
     return {
+      localDataSource: new kendo.data.HierarchicalDataSource({
+        data : this.data
+      }),
+      comboBoxValue:'',
       selectedDeviceTypeId: 0,
       test: "children",    
       arryData:[
@@ -66,10 +71,6 @@ export default {
       
     };
   },
-  mounted(){
-      // console.log(this.localDataSource.data()[0]._childrenOptions[0].name)
-      // console.log(this.data)
-  },
   methods: {
     takeId(id) {
       console.log(id);
@@ -87,11 +88,6 @@ export default {
         }
       });
       return final;
-    },
-    onChange: function(ev) {
-      this.selectedDeviceTypeId = ev.sender._values[0].id;
-      console.log(this.selectedDeviceTypeId)
-      this.$store.commit("setSelectedDeviceTypeId", this.selectedDeviceTypeId);
     }
   },
   computed: {
@@ -102,7 +98,14 @@ export default {
   watch: {
     test(value) {
       console.log(value);
+    },
+    comboBoxValue(value){
+      if(value){
+     this.$store.commit('setSelectedDeviceTypeId',value.id)
+    }else{      
+      this.$store.commit('setSelectedDeviceTypeId',null)
     }
+  }
   }
 };
 </script>

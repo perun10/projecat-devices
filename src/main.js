@@ -6,7 +6,8 @@ import { store } from "./store/store";
 import 'vuetify/dist/vuetify.min.css' // Ensure you are using css-loader
 import axios from 'axios'
 import VueAxios from 'vue-axios'
-
+import Vuelidate from 'vuelidate'
+Vue.use(Vuelidate)
 Vue.config.productionTip = false;
 
 Vue.use(VueAxios, axios)
