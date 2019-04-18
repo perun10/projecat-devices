@@ -5,6 +5,7 @@
        <button type="button" class="btn btn-primary" @click="pushToNewDevice">New device</button>
      </v-flex>
    </v-layout>
+   {{devices}}
    <v-data-table :headers="header" :items="devices" class="elevation-1" item-key="name" v-if="devices">
      <template v-slot:items="props">
     
@@ -112,7 +113,7 @@ export default {
   store.dispatch("getDevices");
   setTimeout(()=>{
    next();
-  },100)  
+  },500)  
    
  },
  mounted(){

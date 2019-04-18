@@ -3,23 +3,29 @@
     <form name="device-type">
       <div class="form-group">
         <label for="name">Name:</label>
-        <input id="name" class="form-control" type="text" title="Required field." v-model.trim="name" >
-        <div class="errors" v-if="!$v.name.required">Field is required</div>
+        <!-- {{$v.name}} -->
+        <input id="name" class="form-control" type="text" title="Required field." v-model.trim="name" @blur="$v.name.$touch()">
+        <div class="errors" v-if="$v.name.$error">Name is required</div>
         <div class="errors" v-if="!$v.name.minLength">Name must have at least {{$v.name.$params.minLength.min}} letters.</div>
       </div>
       <div class="form-group">
         <!--   -->
-        <BasicSelect :data="deviceTypes" v-if="deviceTypes"/>
+        <!-- {{activeDeviceType.name}} -->
+        <BasicSelect :data="deviceTypes"/>
       </div>
       <div class="form-group">
+        <!-- {{$v.description}} -->
         <label for="description-p">Description:</label>
         <textarea
             id="description"
             maxlength="1000"
             title="Required field."
-            v-model="description"
+            v-model.trim="description"
+            @input="$v.description.$touch()"        
             class="form-control"
         ></textarea>
+         <div class="errors" v-if="$v.description.$error">Description is required</div>
+        <div class="errors" v-if="!$v.description.minLength || !$v.description.maxLength ">Description must have between {{$v.description.$params.minLength.min}} and {{$v.description.$params.maxLength.max}} letters .</div>
       </div>
       <div v-if="error" style="color:red">
           <p>{{ msg }}</p>
@@ -35,7 +41,7 @@
 
 <script>
 import BasicSelect from "@/components/DeviceType/BasicSelect.vue";
-import { required, minLength, maxLength } from 'vuelidate/lib/validators'
+import { required, minLength, maxLength , between } from 'vuelidate/lib/validators'
 
 export default {
   components: {
@@ -45,6 +51,11 @@ export default {
     name:{
       required,
       minLength: minLength(4)
+    },
+    description:{
+      required,
+      minLength: minLength(20),
+      maxLength: maxLength(30),
     }
   },
   beforeCreate() {
@@ -64,9 +75,11 @@ export default {
       this.name = this.activeDeviceType.name;
       this.description = this.activeDeviceType.description;
       this.placeholder = this.activeDeviceType.parentId;
+      console.log(this.activeDeviceType)
+      this.$store.commit('setSelectedDeviceTypeId',this.activeDeviceType.parentId)
       //this.$store.commit("setSelectedDeviceTypeId", this.placeholder);
 
-      this.editDeviceType()
+    //  this.editDeviceType()
     }
   },
   computed: {
@@ -106,6 +119,10 @@ export default {
       this.name = value
       this.$v.name.$touch()
     },
+    setDescription(value){
+      this.description = value
+      this.$v.description.$touch()
+    },
     flatten(arr) {
       var final = [];
       var self = this;
@@ -119,7 +136,7 @@ export default {
       return final;
     },
     newDeviceType() {
-      if(!this.$v.name.$invalid){
+      if(!this.$v.name.$invalid && !this.$v.description.$invalid){
         console.log(this.selectedId + ","+ this.name)
         let parent = 0
         this.selectedId === null ? parent = null : parent = this.selectedId
@@ -142,6 +159,9 @@ export default {
         //this.$store.dispatch('createNewDeviceType', createDeviceType)
 
         this.goBack()
+      }else{
+                alert('FORM INVALID')
+
       }
       // if (this.name && this.description) {
       //  let parentID = '';
@@ -177,18 +197,20 @@ export default {
         // console.log(this.activeDeviceType.description)
         // console.log(this.activeDeviceType.parentid)
       let deviceTypeData;
-
+      console.log(this.selectedId)
       let parentID;
         this.selectedId === null ? parentID = this.activeDeviceType.parentid : parentID = this.selectedId;
-      
+     // console.log(this.activeDeviceType.id)
       deviceTypeData = {
           "id": this.activeDeviceType.id,
           "parentid": parentID,
           "name": this.name,
           "description": this.description
       }
+        this.$store.dispatch('getDeviceTypeProperties', this.selectedId)
+      // this.$store.dispatch('createNewDeviceType', deviceTypeData);
+       this.$store.commit('setActiveDeviceType', deviceTypeData);
 
-       this.$store.dispatch('createNewDeviceType', deviceTypeData);
        this.$store.commit('setDeviceTypeName', this.name);
        this.$emit('clicked', 'builder');
     },

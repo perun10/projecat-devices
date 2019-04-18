@@ -1,12 +1,13 @@
 <template>
     <div>
+      <label for="dropdown" style="display:block;">Select device type :</label>
       <DropDownTree
           :data-source="localDataSource"
           :data-text-field="['name']"
           :scheme-model-hasChildren="'children'"
           :scheme-model-children="'items'"
-          v-model="comboBoxValue"          
-          placeholder="Select parent type"      
+          v-model="comboBoxValue"       
+          placeholder="Device Type"
           style="width: 300px;"
         ></DropDownTree>
    
@@ -27,7 +28,8 @@ export default {
     DropDownTree
   },
   data() {
-    return {
+    return {    
+      model:"", 
       localDataSource: new kendo.data.HierarchicalDataSource({
         data : this.data
       }),

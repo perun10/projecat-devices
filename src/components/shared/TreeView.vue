@@ -8,6 +8,7 @@
         </v-layout>      
         <v-treeview
           :items="data"
+          :open-on-click="true"
           :open-all="true"
           item-children="items"
           item-key="id"
@@ -87,7 +88,7 @@ export default {
       this.activeDevType = null;
     },
     onEdit(item) {
-      // console.log(item);
+      console.log(item);
       this.$store.commit("setActiveDeviceType", item);
       this.$store.commit("setEditMode", true);
       // console.log(this.$store.getters.activeDeviceType, "act");

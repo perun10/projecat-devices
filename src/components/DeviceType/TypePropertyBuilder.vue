@@ -227,7 +227,8 @@ export default {
                     required: this.checkbox,
                     type: this.type,
                     id: this.properties[this.fieldId].id,
-                    localID: this.fieldId
+                    localID: this.fieldId,
+                    
                 }
                 return this.closeDialog();
             } 
@@ -235,8 +236,10 @@ export default {
                 nameProperty: this.nameProperty,
                 required: this.checkbox,
                 type: this.type,
-                id: Math.floor(Math.random() * 400),
-                localID: this.fieldId
+                id: 0,
+                localID: this.fieldId,
+                deviceTypeId :this.activeDeviceType.id
+               
             };
             this.properties.push(properties);
             let index = this.properties.findIndex(property => property.id === 404)
@@ -275,16 +278,17 @@ export default {
         cancel() {
     this.$store.commit('setNewDeviceTypeProperties',null)
           this.$store.commit('setSelectedDeviceTypeId',null)
+       this.$store.commit('setActiveDeviceType', null);
 
              this.$router.push('/')
-          if(!this.editMode){
-          // console.log(this.activeDeviceType.id)
-         // this.$store.dispatch('deleteDeviceType',{id:this.activeDeviceType.id})
-            //this.$router.push("/");
-          }else{
-           // this.$router.push("/");
+        //   if(!this.editMode){
+        //   // console.log(this.activeDeviceType.id)
+        //  // this.$store.dispatch('deleteDeviceType',{id:this.activeDeviceType.id})
+        //     //this.$router.push("/");
+        //   }else{
+        //    // this.$router.push("/");
 
-          }
+        //   }
         },
         goBack() {
           //  this.$store.commit('setEditMode', true);
@@ -294,14 +298,25 @@ export default {
             this.$emit("clicked", "info");
         },
         onSave() {
+            let idPar = 0
+            let devicetypeid = 0
+            if(this.editMode){
+                idPar = this.selectedId
+                console.log(idPar)
+                devicetypeid = this.activeDeviceType.id
+            }else {
+                idPar = this.activeDeviceType.parentId
+            }
             console.log(this.properties)
+                //   console.log(this.activeDeviceType.id)
+
             this.properties.forEach(property => delete property.localID);
             const data = {
                 name:this.activeDeviceType.name,
                 description:this.activeDeviceType.description,
-                parentId:this.activeDeviceType.parentId,
+                parentId:idPar,
                 properties: this.properties,
-             //   id: this.activeDeviceTypeID
+               id: devicetypeid
             };
             console.log(data)
             this.$store.dispatch('createNewDeviceType',data).then(()=>{
@@ -309,10 +324,12 @@ export default {
                 setTimeout(() => {
                     this.$router.push('/')
                     
-                }, 100)
+                }, 200)
                 this.$store.dispatch('getDeviceTypes')
-            this.$store.commit('setLoader',false)
+                          this.$store.commit('setNewDeviceTypeProperties',null)
+                this.$store.commit('setSelectedDeviceTypeId',null)
             })
+            this.$store.commit('setLoader',false)
            
         }
     }

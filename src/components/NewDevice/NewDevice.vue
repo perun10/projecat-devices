@@ -218,7 +218,7 @@ export default {
       valid: false,
       nameRules: [
         v => !!v || "Name is required",
-        v => v.length <= 10 || "Name must be less than 10 characters"
+        v => v.length <= 20 || "Name must be less than 20 characters"
       ],
       descripRules: [
         v => !!v || "Description is required",

@@ -52,7 +52,7 @@ const actions = {
             console.log(payload)
             axios.post('http://localhost:21021/api/services/app/DeviceTypeService/CreateOrUpdateDeviceType', payload)
             .then(response => 
-                console.log(response));
+                console.log(response.data));
              //router.push('/');
              commit('setLoader',false)
         // axios.post('http://localhost:21021/api/services/app/DeviceTypeService/CreateOrUpdateDeviceType', payload)
