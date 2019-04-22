@@ -16,7 +16,7 @@
 
         <!-- STEP 1 -->
       <v-stepper-content step="newDevice">
-        <TreeView :data="deviceTypes" :newDeviceType="false" v-if="deviceTypes"/>
+        <TreeView :data="deviceTypes" :newDeviceType="false" :activChild="true" v-if="deviceTypes"/>
         <v-layout row wrap justify-center>
           <p v-if="message" style="color:red;">SELECTE DEVICE TYPE</p>
         </v-layout>
@@ -167,6 +167,7 @@ export default {
     beforeDestroy() {
         this.$store.commit("setTabLocation", "newDevice");
         this.$store.commit("setDeviceTypeId", null);
+        this.$store.commit('setEditDeviceMode', false);
     },
     created() {
         if(this.tabLocation){

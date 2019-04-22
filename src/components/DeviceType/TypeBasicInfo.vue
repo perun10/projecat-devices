@@ -1,95 +1,124 @@
 <template>
-  <div class="container">
+  <v-container grid-list-xs>
     <form name="device-type">
-      <div class="form-group">
-        <label for="name">Name:</label>
-        <!-- {{$v.name}} -->
-        <input id="name" class="form-control" type="text" title="Required field." v-model.trim="name" @blur="$v.name.$touch()">
-        <div class="errors" v-if="$v.name.$error">Name is required</div>
-        <div class="errors" v-if="!$v.name.minLength">Name must have at least {{$v.name.$params.minLength.min}} letters.</div>
-      </div>
-      <div class="form-group">
-        <!--   -->
-        <!-- {{activeDeviceType.name}} -->
-        <BasicSelect :data="deviceTypes" :model="activeDeviceType.name"/>
-        <!-- {{activeDeviceType}} -->
-      </div>
-      <div class="form-group">
-        <!-- {{$v.description}} -->
-        <label for="description-p">Description:</label>
-        <textarea
+      <v-layout row wrap>
+        <v-flex xs6>
+         
+          <label for="name">
+            Name
+            <span style="color:red;">*</span>
+          </label>
+          <input
+            id="name"
+            class="form-control"
+            type="text"
+            title="Required field."
+            style="width:90%;"
+            v-model.trim="name"
+            @blur="$v.name.$touch()"
+          >
+          <div class="errors" v-if="$v.name.$error">Name is required</div>
+          <div
+            class="errors"
+            v-if="!$v.name.minLength"
+          >Name must have at least {{$v.name.$params.minLength.min}} letters.</div>
+        </v-flex>
+        <v-flex xs6>
+          <BasicSelect :data="deviceTypes" :model="activeDeviceType.name"/>
+        </v-flex>
+      </v-layout>
+      <v-layout row wrap mt-5>
+        <v-flex xs12>
+          <label for="description-p">Description</label>
+          <textarea
             id="description"
             maxlength="1000"
             title="Required field."
             v-model.trim="description"
-            @input="$v.description.$touch()"        
+            @input="$v.description.$touch()"
             class="form-control"
-        ></textarea>
-         <div class="errors" v-if="$v.description.$error">Description is required</div>
-        <div class="errors" v-if="!$v.description.minLength || !$v.description.maxLength ">Description must have between {{$v.description.$params.minLength.min}} and {{$v.description.$params.maxLength.max}} letters .</div>
-      </div>
+          ></textarea>
+          <div class="errors" v-if="$v.description.$error">Description is required</div>
+          <div
+            class="errors"
+            v-if="!$v.description.minLength || !$v.description.maxLength "
+          >Description must have between {{$v.description.$params.minLength.min}} and {{$v.description.$params.maxLength.max}} letters .</div>
+        </v-flex>
+      </v-layout>
       <div v-if="error" style="color:red">
-          <p>{{ msg }}</p>
+        <p>{{ msg }}</p>
       </div>
-      <div>
-        <v-btn color="warning" to="/">Cancel</v-btn>
-        <v-btn color="primary" @click.prevent="newDeviceType" v-if="!editMode">Next</v-btn>
-        <v-btn color="primary" @click.prevent="editDeviceType" v-if="editMode">Next</v-btn>
-      </div>
+      <v-layout row wrap style="min-height:250px;"></v-layout>
+      <v-layout row wrap justify-center style="border-top:1px solid black;" pt-2>
+        <v-btn color="transparent" to="/">Cancel</v-btn>
+        <v-btn color="primary" @click.prevent="newDeviceType">Next</v-btn>
+        <!-- <v-btn color="primary" @click.prevent="editDeviceType" v-if="editMode">Next</v-btn> -->
+      </v-layout>
     </form>
-      <Alert :snackbar="snackbar" :y="y" :x="x" :timeout="timeout" :text="text"/>
-  </div>
+    <Alert :snackbar="snackbar" :y="y" :x="x" :timeout="timeout" :text="text"/>
+  </v-container>
 </template>
 
 <script>
 import BasicSelect from "@/components/DeviceType/BasicSelect.vue";
-import { required, minLength, maxLength , between } from 'vuelidate/lib/validators'
-import Alert from "@/components/shared/Alert.vue"
-
+import {
+  required,
+  minLength,
+  maxLength,
+  between
+} from "vuelidate/lib/validators";
+import Alert from "@/components/shared/Alert.vue";
+import {store} from '@/store/store'
 export default {
+  data() {
+    return {
+      snackbar: false,
+      y: "bottom",
+      x: "left",
+      mode: "",
+      timeout: 3000,
+      text: "Hello, I'm a snackbar",
+      placeholder: "Select device type parent...",
+      msg: "Name and description needed",
+      test: [],
+      error: false,
+      arrNames: [],
+      name: "",
+      description: "",
+      parentDeviceType: "Laptop"
+    };
+  },
   components: {
     Alert,
     BasicSelect
   },
-  validations:{
-    name:{
+  validations: {
+    name: {
       required,
       minLength: minLength(4)
     },
-    description:{
+    description: {
       required,
       minLength: minLength(20),
-      maxLength: maxLength(30),
+      maxLength: maxLength(30)
     }
-  },
-  beforeCreate() {
-    if (!this.$store.getters.deviceTypes) {
-      this.$store.dispatch("getDeviceTypes");
-    }
-  },
+  },  
   beforeDestroy() {
-    this.$store.commit('setEditMode', false);
-    // this.$store.commit('setSelectedDeviceTypeId', null);
+    this.$store.commit("setEditMode", false);
   },
-  mounted(){
-    // console.log(this.selectedId)
-  },
-  created() {
-    if(this.editMode) {
+  created(){
+ if (this.editMode) {
       this.name = this.activeDeviceType.name;
       this.description = this.activeDeviceType.description;
       this.placeholder = this.activeDeviceType.parentId;
-      console.log(this.activeDeviceType)
-      this.$store.commit('setSelectedDeviceTypeId',this.activeDeviceType.parentId)
-      //this.$store.commit("setSelectedDeviceTypeId", this.placeholder);
-
-    //  this.editDeviceType()
+      console.log(this.activeDeviceType);
+      this.$store.commit(
+        "setSelectedDeviceTypeId",
+        this.activeDeviceType.parentId
+      );
     }
   },
-  computed: {
-    flatted() {
-      return this.flatten(this.deviceTypes);
-    },
+  computed: {  
     deviceTypes() {
       return this.$store.getters.deviceTypes;
     },
@@ -102,144 +131,58 @@ export default {
     selectedId() {
       return this.$store.getters.selectedDeviceTypeId;
     },
-    myDeviceTypesArr() {
-      let arr = [];
-      arr.push(this.deviceTypes);
-      return arr;
-    },
-    myTypeNames() {
-      let arr = [];
-      this.arrNames.push(this.deviceTypes.name);
-      for (let i = 0; i <= this.deviceTypes.children.length - 1; i++) {
-        // console.log(this.deviceTypes.children[i].name);
-        this.arrNames.push(this.deviceTypes.children[i].name);
-      }
-      arr = this.arrNames;
-      return arr;
-    }
   },
   methods: {
     setName(value) {
-      this.name = value
-      this.$v.name.$touch()
+      this.name = value;
+      this.$v.name.$touch();
     },
-    setDescription(value){
-      this.description = value
-      this.$v.description.$touch()
-    },
-    flatten(arr) {
-      var final = [];
-      var self = this;
-      arr.forEach(item => {
-        final.push(item.name);
-        // console.log(item.name);
-        if (typeof item.items !== "undefined") {
-          final = final.concat(self.flatten(item.items));
-        }
-      });
-      return final;
+    setDescription(value) {
+      this.description = value;
+      this.$v.description.$touch();
     },
     newDeviceType() {
-      if(!this.$v.name.$invalid && !this.$v.description.$invalid){
-        console.log(this.selectedId + ","+ this.name)
-        let parent = 0
-        this.selectedId === null ? parent = null : parent = this.selectedId
-        let createDeviceType = {
-          "id":0,
-          "name":this.name,
-          "description":this.description,
-          "parentId":parent
-        }
-        console.log(createDeviceType)
-       if(parent){
-
-         this.$store.dispatch('getDeviceTypeProperties', parent)
-       }
-      
-         
-        this.$store.commit('setActiveDeviceType', createDeviceType);
-
-        // this.$store.commit('setDeviceTypeName', createDeviceType)
-        //this.$store.dispatch('createNewDeviceType', createDeviceType)
-
-        this.goBack()
-      }else{
-              this.text = "Form invalid"
-               this.snackbar = true
-
-      }
-     // this.snackbar = false;
-      // if (this.name && this.description) {
-      //  let parentID = '';
-      // this.selectedId === null ? parentID = null : parentID = this.selectedId
-      //   // console.log(parentID)
-      //   let arr = []
-      //   arr = this.flatted
-      //   // console.log(arr)
-      //   if(!arr.includes(this.name)){    
-      //   this.error = false
-      //   let createDeviceType = {
-      //       "id": 0,
-      //       "parentid": parentID,
-      //       "name": this.name,
-      //       "description": this.description
-      //   }
-
-      //   this.$store.dispatch('createNewDeviceType', createDeviceType)
-      //   this.$store.commit('setDeviceTypeName', this.name)
-
-      //   this.goBack();
-      //   }else{
-      //     this.msg = 'Name already exists'
-      //     this.error = true
-      //   }
-      // } else {
-      //   this.error = true;
-      // }
-    },
-     editDeviceType() {
-        // console.log(this.activeDeviceType)
-        // console.log(this.activeDeviceType.name)
-        // console.log(this.activeDeviceType.description)
-        // console.log(this.activeDeviceType.parentid)
-      let deviceTypeData;
-      console.log(this.selectedId)
+      let createDeviceType;
       let parentID;
-        this.selectedId === null ? parentID = this.activeDeviceType.parentid : parentID = this.selectedId;
-     // console.log(this.activeDeviceType.id)
-      deviceTypeData = {
-          "id": this.activeDeviceType.id,
-          "parentid": parentID,
-          "name": this.name,
-          "description": this.description
-      }
-        this.$store.dispatch('getDeviceTypeProperties', this.selectedId)
-      // this.$store.dispatch('createNewDeviceType', deviceTypeData);
-       this.$store.commit('setActiveDeviceType', deviceTypeData);
+      if (!this.$v.name.$invalid && !this.$v.description.$invalid) {
+        if (this.editMode) {
+          this.selectedId === null
+            ? (parentID = this.activeDeviceType.parentid)
+            : (parentID = this.selectedId);
+          createDeviceType = {
+            id: this.activeDeviceType.id,
+            parentid: parentID,
+            name: this.name,
+            description: this.description
+          };
+        } else {
+          this.selectedId === null
+            ? (parentID = null)
+            : (parentID = this.selectedId);
+          createDeviceType = {
+            id: 0,
+            name: this.name,
+            description: this.description,
+            parentId: parentID
+          };
+        }
+        if (parentID) {
+          this.$store.dispatch("getDeviceTypeProperties", parentID);
+        }
 
-       this.$store.commit('setDeviceTypeName', this.name);
-       this.$emit('clicked', 'builder');
+        this.$store.commit("setActiveDeviceType", createDeviceType);
+        this.goBack();
+      } else {
+        this.text = "Form invalid";
+        this.snackbar = true;
+      }
+      setTimeout(() => {
+    this.snackbar = false
+    
+}, 1000);
     },
     goBack() {
       this.$emit("clicked", "builder");
-    }
-  },
-  data() {
-    return {
-    snackbar: false,
-    y: 'bottom',
-    x: 'left',
-    mode: '',
-    timeout: 6000,
-    text: 'Hello, I\'m a snackbar',
-      placeholder: 'Select device type parent...',
-      msg:'Name and description needed',
-      test: [],
-      error: false,
-      arrNames: [],
-      name: "",
-      description: "",
-      parentDeviceType: "Laptop",     
     }
   }
 };
@@ -251,15 +194,15 @@ export default {
 }
 
 #description {
-  width: 650px;
+  width: 100%;
   min-height: 100px;
 }
 
 #selectType {
   width: 140px;
 }
-.errors{
-  color:red;
-  background-color:none!important;
+.errors {
+  color: red;
+  background-color: none !important;
 }
 </style>

@@ -13,8 +13,10 @@
            <td class="text-left">{{props.item.name}}</td>
            <td class="text-center">{{props.item.deviceTypeName}}</td>
            <td class="text-right">{{props.item.description}}</td>
-           <td class="text-right"> <span class="td-button btn-link"  @click="onEdit(props.item)">Edit</span> <span class="td-button btn-link pl-3" @click="onDelete(props.item)">Delete</span>  <span class="td-button btn-link pl-3">View</span>  </td>
-    
+           <td class="text-right"> <span class="td-button btn-link"  @click="onEdit(props.item)">Edit</span>
+            <span class="td-button btn-link pl-3" @click="onDelete(props.item)">Delete</span> 
+            </td>
+      <!-- <span class="td-button btn-link pl-3">View</span>  -->
          </tr>
      
     

@@ -34,6 +34,17 @@ export default {
     TypeBasicInfo,
     TypePropertyBuilder
   },
+  beforeRouteEnter(to,from,next) {
+     if(!store.getters.deviceTypes){
+      store.dispatch("getDeviceTypes");
+     }
+     store.commit('setLoader',true)
+     setTimeout(() => {
+       next();
+       
+     }, 100);
+     store.commit('setLoader',false)
+  },
   data() {
     return {
       tab: "info",
