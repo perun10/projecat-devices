@@ -5,12 +5,13 @@
           :data-source="localDataSource"
           :data-text-field="['name']"
           :scheme-model-hasChildren="'children'"
-          :scheme-model-children="'items'"
-          v-model="comboBoxValue"       
-          placeholder="Device Type"
+          :scheme-model-children="'items'"   
+          :placeholder="value"
+          v-model="comboBoxValue"                
           style="width: 300px;"
         ></DropDownTree>
-   
+   {{data}}
+   <!-- {{model}} -->
     </div>
 </template>
 
@@ -23,14 +24,14 @@ import {
 } from "@progress/kendo-dropdowntree-vue-wrapper";
 export default {
   name: "BasicSelect",
-  props: ["data"],
+  props: ['data','model'],
   components: {
     DropDownTree
   },
   data() {
-    return {    
-      model:"", 
-      localDataSource: new kendo.data.HierarchicalDataSource({
+    return {             
+        value:"device type",
+        localDataSource: new kendo.data.HierarchicalDataSource({
         data : this.data
       }),
       comboBoxValue:'',
@@ -73,12 +74,33 @@ export default {
       
     };
   },
+  mounted(){
+    if(this.editMode){
+     // console.log(this.flatted)
+     var element = 0;
+      const arr = this.flatted
+      this.value = this.model // placeholder
+      this.placeholder = this.model
+      // arr.forEach(dat => {    
+      //     if(dat.name === this.model){
+      //       element = dat;
+      //       return
+      //     }
+      // });
+      //   console.log(element)
+      //   this.comboBoxValue = element.name
+      //   let arrt = []
+  //       arrt.push(element)
+  // this.localDataSource.remove(element)
+    }
+  },
   methods: {
+    
     takeId(id) {
-      console.log(id);
+     // console.log(id);
     },
     flatten(arr) {
-      console.log(arr);
+     // console.log(arr);
       var final = [];
       var self = this;
       arr.forEach(item => {
@@ -86,16 +108,22 @@ export default {
         // console.log(item.name);
         if (typeof item.items !== "undefined") {
           final = final.concat(self.flatten(item.items));
-          console.log(final)
+        //  console.log(final)
         }
       });
       return final;
-    }
+    },
+        onDataBound: function (ev) {
+            console.log("Event :: data");
+        }
   },
   computed: {
     flatted() {
-      return this.flatten(this.localDataSource);
-    }
+      return this.flatten(this.data);
+    },
+    editMode() {
+            return this.$store.getters.editMode;
+        }
   },
   watch: {
     test(value) {

@@ -3,7 +3,11 @@ import axios from 'axios'
 const state = {   
     devices:null,
     selectedDeviceTypeID:null   ,
-    tab: 'newDevice'
+    tab: 'newDevice',
+    editDeviceMode: false,
+    deviceParentID: null,
+    activeDevice: [],
+    activeDeviceProperties: []
 };
 
 const mutations = {   
@@ -15,6 +19,18 @@ const mutations = {
     },
     setTabLocation(state,payload){
         state.tab = payload
+    },
+    setEditDeviceMode(state, payload) {
+        state.editDeviceMode = payload;
+    },
+    setDeviceParentID(state, payload) {
+        state.deviceParentID = payload;
+    },
+    setActiveDevice(state, payload) {
+        state.activeDevice = payload;
+    },
+    setActiveDeviceProperties(state, payload) {
+        state.activeDeviceProperties = payload;
     }
 };
 
@@ -41,6 +57,22 @@ const actions = {
             console.log(error.message);
             commit('setLoader', false);
         }) 
+    },
+    async getDeviceTypePropertiesEditMode({ commit }, payload) {
+        commit('setLoader', true);
+        await axios.get('http://localhost:21021/api/services/app/DeviceService/GetDeviceTypesWithPropValues', {
+            params: {
+                deviceId: payload.deviceId,
+                deviceTypeId: payload.deviceTypeId
+            }
+        }
+        ).then((response) => {
+            let data = [];
+            data.push(response.data.result);
+            console.log(data, 'data')
+            commit('setActiveDeviceProperties', data);
+            commit('setLoader', false);
+        });
     }
 
 };
@@ -54,6 +86,18 @@ const getters = {
     },
     tabLocation(state){
         return state.tab
+    },
+    editDeviceMode(state) {
+        return state.editDeviceMode;
+    },
+    deviceParentID(state) {
+        return state.deviceParentID;
+    },
+    activeDevice(state) {
+        return state.activeDevice;
+    },
+    activeDeviceProperties(state) {
+        return state.activeDeviceProperties;
     }
 };
 

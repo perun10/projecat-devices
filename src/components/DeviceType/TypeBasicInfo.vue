@@ -11,7 +11,8 @@
       <div class="form-group">
         <!--   -->
         <!-- {{activeDeviceType.name}} -->
-        <BasicSelect :data="deviceTypes"/>
+        <BasicSelect :data="deviceTypes" :model="activeDeviceType.name"/>
+        <!-- {{activeDeviceType}} -->
       </div>
       <div class="form-group">
         <!-- {{$v.description}} -->
@@ -36,15 +37,18 @@
         <v-btn color="primary" @click.prevent="editDeviceType" v-if="editMode">Next</v-btn>
       </div>
     </form>
+      <Alert :snackbar="snackbar" :y="y" :x="x" :timeout="timeout" :text="text"/>
   </div>
 </template>
 
 <script>
 import BasicSelect from "@/components/DeviceType/BasicSelect.vue";
 import { required, minLength, maxLength , between } from 'vuelidate/lib/validators'
+import Alert from "@/components/shared/Alert.vue"
 
 export default {
   components: {
+    Alert,
     BasicSelect
   },
   validations:{
@@ -160,9 +164,11 @@ export default {
 
         this.goBack()
       }else{
-                alert('FORM INVALID')
+              this.text = "Form invalid"
+               this.snackbar = true
 
       }
+     // this.snackbar = false;
       // if (this.name && this.description) {
       //  let parentID = '';
       // this.selectedId === null ? parentID = null : parentID = this.selectedId
@@ -220,6 +226,12 @@ export default {
   },
   data() {
     return {
+    snackbar: false,
+    y: 'bottom',
+    x: 'left',
+    mode: '',
+    timeout: 6000,
+    text: 'Hello, I\'m a snackbar',
       placeholder: 'Select device type parent...',
       msg:'Name and description needed',
       test: [],

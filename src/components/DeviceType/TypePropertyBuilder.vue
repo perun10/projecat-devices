@@ -117,21 +117,30 @@
                 <v-btn color="success" class="btn-save" @click="onSave">Save</v-btn>
             </v-flex>
         </v-layout>
+         <Alert :snackbar="snackbar" :y="y" :x="x" :timeout="timeout" :text="text"/>
     </div>
 </template>
 
 <script>
+import Alert from "@/components/shared/Alert.vue"
 import RecursiveComponent from "./RecursiveComponent.vue";
 import draggable from "vuedraggable";
 import Vue from 'vue';
 
 export default {
     components: {
+        Alert,
         RecursiveComponent,
         draggable
     },
     data() {
         return {
+        snackbar: false,
+        y: 'bottom',
+        x: 'left',
+        mode: '',
+        timeout: 6000,
+        text: 'Hello, I\'m a snackbar',
             myDeviceTypeProperties: [],
             myArray: [
                 {
@@ -321,10 +330,12 @@ export default {
             console.log(data)
             this.$store.dispatch('createNewDeviceType',data).then(()=>{
                 this.$store.commit('setLoader', true);
+                this.text = "New device type created"
+                this.snackbar = true
                 setTimeout(() => {
                     this.$router.push('/')
                     
-                }, 200)
+                }, 500)
                 this.$store.dispatch('getDeviceTypes')
                           this.$store.commit('setNewDeviceTypeProperties',null)
                 this.$store.commit('setSelectedDeviceTypeId',null)

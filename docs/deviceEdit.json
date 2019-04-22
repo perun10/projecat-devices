@@ -1,0 +1,45 @@
+[
+    {
+        "deviceID": 0,
+        "deviceName": "DEVICE MONITOR",
+        "description": "Opis DEVICE MONITORA",
+        "deviceTypes": [
+            {
+                "devicetypeID": "1",
+                "devicetypeName": "Racunar",
+                "propValues": [
+                    {
+                        "propName": "CPU",
+                        "value": "2.6ghz",
+                        "required": true,
+                        "type": "input"
+                    },
+                    {
+                        "propName": "RAM",
+                        "value": "8GB",
+                        "required": false,
+                        "type": "textarea"
+                    }
+                ]
+            },
+            {
+                "devicetypeID": "2",
+                "devicetypeName": "Monitor",
+                "propValues": [
+                    {
+                        "propName": "Velicina",
+                        "value": "23 inca",
+                        "required": true,
+                        "type": "input"
+                    },
+                    {
+                        "propName": "Boja",
+                        "value": "",
+                        "required": false,
+                        "type": "input"
+                    }
+                ]
+            }
+        ]
+    }
+]
