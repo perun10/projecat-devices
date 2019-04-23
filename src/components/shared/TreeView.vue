@@ -68,7 +68,7 @@ export default {
     }
   },
   beforeDestroy() {
-    console.log(this.value);
+    // console.log(this.value);
   },
   data() {
     return {

@@ -10,8 +10,7 @@
           v-model="comboBoxValue"                
           style="width:100%;"
         ></DropDownTree>
-   <!-- {{data}} -->
-   <!-- {{model}} -->
+     <!-- {{model}} -->
     </div>
 </template>
 

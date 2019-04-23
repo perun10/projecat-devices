@@ -69,7 +69,7 @@ const actions = {
         ).then((response) => {
             let data = [];
             data.push(response.data.result);
-            console.log(data, 'data')
+         //   console.log(data, 'data')
             commit('setActiveDeviceProperties', data);
             commit('setLoader', false);
         });

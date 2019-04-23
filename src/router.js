@@ -4,6 +4,7 @@ import DeviceType from "./views/DeviceType.vue";
 import Devices from "./views/Devices.vue";
 import NewDeviceType from "@/components/DeviceType/NewDeviceType.vue";
 import NewDevice from "@/components/NewDevice/NewDevice.vue"
+import DeviceView from "@/components/NewDevice/DeviceView.vue"
 Vue.use(Router);
 
 export default new Router({
@@ -19,7 +20,13 @@ export default new Router({
     {
       path:'/devices',
       name:'devices',
-      component:Devices
+      component:Devices,
+        children: [
+                {   name: 'device-view',
+                    path: ':id',
+                    component: DeviceView
+                }
+            ]
     },
     {
 

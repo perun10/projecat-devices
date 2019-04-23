@@ -28,9 +28,7 @@
                   </div>
                 </div>
               </v-card-text>
-              <v-card-text v-else>
-                <h3>No properties</h3>
-              </v-card-text>
+            
             </v-card>
           </v-expansion-panel-content>
         </v-expansion-panel>

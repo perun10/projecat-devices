@@ -257,7 +257,9 @@ export default {
                 deviceName: this.name,
                 description: this.description,
                 id: 0,
-                deviceTypes: this.newDevicesValues
+                deviceTypes: this.newDevicesValues,
+                deviceTypeId: this.selectedIdType
+
             };
 
             this.axios
