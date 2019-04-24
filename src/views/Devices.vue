@@ -6,7 +6,7 @@
             <button type="button" class="btn btn-primary" @click="pushToNewDevice">New device</button>
             </v-flex>
         </v-layout>
-        <v-data-table :headers="header" :items="devices" class="elevation-1" item-key="name" v-if="devices">
+      <v-data-table :headers="header" :items="devices" class="elevation-1" item-key="name" v-if="devices">
             <template v-slot:items="props">
             
             
@@ -20,15 +20,45 @@
             
             </template>
         </v-data-table>
+        <button @click="exportPDFWithComp" class="k-button">Export PDF</button>
+    
+    <grid-pdf-export ref="gridPdfExport" :margin="'1cm'" :paper-size="'a4'" :items="devices">
+        <Grid id="target"         
+            :style="{height: '280px'}"
+            :data-items="devices"
+            :columns="columns"
+           >
+        </Grid>
+     
+        <!-- <kendo-contextmenu :target="target">
+               
+            <li @click="viewDevice(devices[1].id, devices[1].deviceTypeId, devices[1].name)">View</li>
+            <li  @click="onEdit(props.item)">Edit</li>
+            <li @kendocontextmenu="test()">Delete</li>
+      
+     
+    </kendo-contextmenu> -->
+    </grid-pdf-export>
+            {{dataI}}
         <prompt :visible="dialogVisible" :activeDevice="activeDevice" @close="onClose" :mode="mode"></prompt>
         </v-container>
         <transition name="slide-fade">
             <router-view></router-view>
         </transition>
+         
+       
     </div>
 </template>
 
 <script>
+import { GridPdfExport } from '@progress/kendo-vue-pdf';
+import { Grid } from '@progress/kendo-vue-grid';
+import "@progress/kendo-theme-default/dist/all.css";
+import { ContextMenu,LayoutInstaller } from '@progress/kendo-layout-vue-wrapper';
+import Vue from 'vue'
+Vue.use(LayoutInstaller)
+Vue.component('Grid', Grid);
+Vue.component('grid-pdf-export', GridPdfExport);
 import Prompt from "@/components/shared/Prompt";
 import {store} from '@/store/store'
 import { setTimeout } from 'timers';
@@ -37,9 +67,13 @@ import { constants } from 'crypto';
 export default {
     components: {
         Prompt
+        
     },
     data() {
         return {
+            dataI:'',
+            target:'#target',
+            columns:[{field:'name',title:'Name'},{field:'deviceTypeName',title:"Type"},{field:'description',title:"Description"}],
             myDevs:[],
             active: "",
             itemKey: [],
@@ -98,6 +132,12 @@ export default {
         }
     },
     methods: {
+        test(ev){
+            console.log(ev)
+        },
+          exportPDFWithComp: function() {
+            (this.$refs.gridPdfExport).save();
+        },
         async viewDevice(id, typeID, name2) {
             await this.$store.dispatch('getDeviceTypePropertiesEditMode', {
                         deviceId: id,

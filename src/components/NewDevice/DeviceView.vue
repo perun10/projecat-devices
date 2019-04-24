@@ -11,9 +11,11 @@
                     <p> {{ activeDev[0].description }}</p>
                 </div>
                 <div v-if="activeDev">
-                    <h2 class="device-props">Device properties:</h2>
-                    <p v-for="(property, index) in deviceProperties[0].propValues" :key="index"><span class="property">{{ property.propName }}:</span> {{ property.value }}</p>
-                </div>
+                   <h2 class="device-props">Device properties:</h2>
+                   <div v-for="(property, index) in deviceProperties[0].propValues" :key="index">
+                       <p v-if="property.value"><span class="property">{{ property.propName }}:</span> {{ property.value }}</p>
+                   </div>
+               </div>
             </v-flex>
         </v-layout>
    </v-container>
