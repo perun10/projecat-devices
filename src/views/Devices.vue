@@ -6,7 +6,7 @@
             <button type="button" class="btn btn-primary" @click="pushToNewDevice">New device</button>
             </v-flex>
         </v-layout>
-      <v-data-table :headers="header" :items="devices" class="elevation-1" item-key="name" v-if="devices">
+      <!-- <v-data-table :headers="header" :items="devices" class="elevation-1" item-key="name" v-if="devices">
             <template v-slot:items="props">
             
             
@@ -19,58 +19,77 @@
             
             
             </template>
-        </v-data-table>
-        <button @click="exportPDFWithComp" class="k-button">Export PDF</button>
-    
+        </v-data-table> -->
+
     <grid-pdf-export ref="gridPdfExport" :margin="'1cm'" :paper-size="'a4'" :items="devices">
-        <Grid id="target"         
-            :style="{height: '280px'}"
-            :data-items="devices"
-            :columns="columns"
-           >
-        </Grid>
-     
-        <!-- <kendo-contextmenu :target="target">
+           <Grid id="target"
+        ref="grid"
+        :style="{height: 'auto'}"
+        :data-items="devices"
+        :sortable="true"
+        :sort= "sort"
+        :selected-field="selectedField"
+        :columns="columns"
+        @rowclick="onRowClick"
+        @sortchange="sortChangeHandler"
+        >
+
+    </Grid>
+    
+   
+       <kendo-contextmenu :target="target" filter="td">
                
-            <li @click="viewDevice(devices[1].id, devices[1].deviceTypeId, devices[1].name)">View</li>
-            <li  @click="onEdit(props.item)">Edit</li>
-            <li @kendocontextmenu="test()">Delete</li>
+            <li @click="viewDevice(selectedID.id,selectedID.deviceTypeId,selectedID.name)">View</li>
+            <li  @click="onEdit(selectedID)">Edit</li>
+            <li @click="onDelete(selectedID)">Delete</li>
+            <!-- <li @click="test">Test</li> -->
       
      
-    </kendo-contextmenu> -->
+    </kendo-contextmenu>
     </grid-pdf-export>
-            {{dataI}}
+    <v-btn color="error" @click="exportPDFWithComp">Export PDF</v-btn>
+    <v-btn color="info" type="button" id="printGrid" @click="printGrid">Print</v-btn>
+    <!-- <button @click="exportPDFWithComp" class="k-button">Export PDF</button>
+        <button type="button" class="k-button" id="printGrid" @click="printGrid">Print</button> -->
+
         <prompt :visible="dialogVisible" :activeDevice="activeDevice" @close="onClose" :mode="mode"></prompt>
         </v-container>
         <transition name="slide-fade">
             <router-view></router-view>
         </transition>
          
-       
     </div>
 </template>
 
 <script>
+
 import { GridPdfExport } from '@progress/kendo-vue-pdf';
 import { Grid } from '@progress/kendo-vue-grid';
 import "@progress/kendo-theme-default/dist/all.css";
 import { ContextMenu,LayoutInstaller } from '@progress/kendo-layout-vue-wrapper';
 import Vue from 'vue'
 Vue.use(LayoutInstaller)
-Vue.component('Grid', Grid);
+// Vue.component('Grid', Grid);
 Vue.component('grid-pdf-export', GridPdfExport);
 import Prompt from "@/components/shared/Prompt";
 import {store} from '@/store/store'
 import { setTimeout } from 'timers';
 import { constants } from 'crypto';
-
+import { orderBy } from '@progress/kendo-data-query';
 export default {
     components: {
-        Prompt
+       Prompt,
+       Grid
         
     },
     data() {
         return {
+             sort: [
+                { field: 'name', dir: 'asc' }
+            ],
+            selectedField: 'selected',
+            selectedID:1,
+            numArr:[],
             dataI:'',
             target:'#target',
             columns:[{field:'name',title:'Name'},{field:'deviceTypeName',title:"Type"},{field:'description',title:"Description"}],
@@ -122,19 +141,83 @@ export default {
         this.$store.commit('setLoader',false)
     },
     computed: {
-        devices() {
+        devices:{
+            get : function(){
             let arr = [];
             arr = this.$store.getters.devices.data.result;
-            return arr;
+            return orderBy(arr,this.sort);
+            }
         },
         devicetypeProperties() {
             return this.$store.getters.newDeviceTypeProperties;
+        },
+        selectedItem () {
+            return this.devices.find((item) => item.id === this.selectedID);
         }
     },
     methods: {
-        test(ev){
-            console.log(ev)
+         sortChangeHandler: function(e) {
+            this.sort = e.sort;
         },
+        printGrid() {
+        var gridElement = $('#target'),
+            printableContent = '',
+            win = window.open('', '', 'width=800, height=500, resizable=1, scrollbars=1'),
+            doc = win.document.open();
+        var htmlStart =
+            '<!DOCTYPE html>' +
+            '<html>' +
+            '<head>' +
+            '<meta charset="utf-8" />' +
+            '<title>Devices Print</title>' +
+            '<link href="http://kendo.cdn.telerik.com/' + kendo.version + '/styles/kendo.common.min.css" rel="stylesheet" /> ' +
+            '<style>' +
+            'html { font: 11pt sans-serif; }' +
+            '.k-grid { border-top-width: 10px; }' +
+            '.k-grid, .k-grid-content { height: auto !important; }' +
+            '.k-grid-content { overflow: visible !important;}' +
+            'div.k-grid table { width:100%; }' +
+            '.k-grid-content  td:nth-child(2) {padding-left:65px;}'+
+            'div.k-grid table tr td {border:1px solid black; table-layout: auto;text-align:left; }' +
+            '.k-grid .k-grid-header th { border-top:0; text-align:center; }' +
+            '.k-grouping-header, .k-grid-toolbar, .k-grid-pager > .k-link { display: none; }' +
+            '.k-grid-pager { display: none; }' + 
+            '.moveTo { color:red; }' + // optional: hide the whole pager
+            '</style>' +
+            '</head>' +
+            '<body>';
+
+        var htmlEnd =
+            '</body>' +
+            '</html>';
+        
+        var gridHeader = gridElement.children('.k-grid-header');
+        if (gridHeader[0]) {
+          var thead = gridHeader.find('thead').clone().addClass('k-grid-header');
+          printableContent = gridElement
+            .clone()
+            .children('.k-grid-header')
+            .end()
+            .children('.k-grid-content')
+            .find('table')
+            .first()
+            .children('tbody').before(thead)
+            .end()
+            .end()
+            .end()
+            .end()[0].outerHTML;
+        } else {
+          printableContent = gridElement.clone()[0].outerHTML;
+        }
+
+        doc.write(htmlStart + printableContent + htmlEnd);
+        doc.close();
+        win.print();
+      },
+        
+        onRowClick(event){            
+                this.selectedID = event.dataItem  
+        },        
           exportPDFWithComp: function() {
             (this.$refs.gridPdfExport).save();
         },
