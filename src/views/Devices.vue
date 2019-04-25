@@ -21,8 +21,8 @@
             </template>
         </v-data-table> -->
 
-    <grid-pdf-export ref="gridPdfExport" :margin="'1cm'" :paper-size="'a4'" :items="devices">
-           <Grid id="target"
+    <!--  -->
+           <!-- <Grid id="target"
         ref="grid"
         :style="{height: 'auto'}"
         :data-items="devices"
@@ -34,10 +34,36 @@
         @sortchange="sortChangeHandler"
         >
 
-    </Grid>
-    
-   
-       <kendo-contextmenu :target="target" filter="td">
+    </Grid> -->
+ 
+     <kendo-grid :data-source="devices" id="target"
+        ref="grid"
+        :toolbar="['pdf']"
+                :pdf-all-pages="true"
+                :pdf-avoid-links="true"
+                :pdf-paper-size="'A4'"
+                :pdf-margin="{ top: '2cm', left: '1cm', right: '1cm', bottom: '1cm' }"
+                :pdf-landscape="true"
+                :pdf-repeat-headers="true"
+                :pdf-scale="0.8">
+        <kendo-grid-column :field="'name'"
+                           :title="'Name'"
+                           :width="40"></kendo-grid-column>
+
+        <kendo-grid-column 
+        :field="'deviceTypeName'" 
+        :title="'Type'" 
+        :width="40">
+        </kendo-grid-column>
+        <kendo-grid-column
+        :field="'description'" 
+        :title="'description'" 
+        :width="40">
+        </kendo-grid-column>
+
+       
+    </kendo-grid>
+       <kendo-contextmenu :target="target" filter="tr" @open="contextOpen">
                
             <li @click="viewDevice(selectedID.id,selectedID.deviceTypeId,selectedID.name)">View</li>
             <li  @click="onEdit(selectedID)">Edit</li>
@@ -46,11 +72,11 @@
       
      
     </kendo-contextmenu>
-    </grid-pdf-export>
-    <v-btn color="error" @click="exportPDFWithComp">Export PDF</v-btn>
-    <v-btn color="info" type="button" id="printGrid" @click="printGrid">Print</v-btn>
-    <!-- <button @click="exportPDFWithComp" class="k-button">Export PDF</button>
-        <button type="button" class="k-button" id="printGrid" @click="printGrid">Print</button> -->
+   
+    <!-- <v-btn color="error" @click="exportPDFWithComp">Export PDF</v-btn>  -->
+    <!-- <v-btn color="info" type="button" id="printGrid" @click="printGrid" ref='print'>Print</v-btn> -->
+    <!-- <button @click="exportPDFWithComp" class="k-button">Export PDF</button>-->
+    <button type="button" class="k-button" id="printGrid" @click="printGrid" ref="print">Print</button>
 
         <prompt :visible="dialogVisible" :activeDevice="activeDevice" @close="onClose" :mode="mode"></prompt>
         </v-container>
@@ -64,11 +90,14 @@
 <script>
 
 import { GridPdfExport } from '@progress/kendo-vue-pdf';
-import { Grid } from '@progress/kendo-vue-grid';
+// import { Grid } from '@progress/kendo-vue-grid';
 import "@progress/kendo-theme-default/dist/all.css";
 import { ContextMenu,LayoutInstaller } from '@progress/kendo-layout-vue-wrapper';
+import { Grid, GridInstaller } from '@progress/kendo-grid-vue-wrapper'
+
 import Vue from 'vue'
 Vue.use(LayoutInstaller)
+Vue.use(GridInstaller)
 // Vue.component('Grid', Grid);
 Vue.component('grid-pdf-export', GridPdfExport);
 import Prompt from "@/components/shared/Prompt";
@@ -76,6 +105,9 @@ import {store} from '@/store/store'
 import { setTimeout } from 'timers';
 import { constants } from 'crypto';
 import { orderBy } from '@progress/kendo-data-query';
+import { Button, ButtonGroup, ToolBar, ToolBarItem, ButtonGroupButton, ButtonsInstaller } from '@progress/kendo-buttons-vue-wrapper';
+Vue.use(ButtonsInstaller);
+
 export default {
     components: {
        Prompt,
@@ -83,7 +115,7 @@ export default {
         
     },
     data() {
-        return {
+        return {            
              sort: [
                 { field: 'name', dir: 'asc' }
             ],
@@ -156,6 +188,15 @@ export default {
         }
     },
     methods: {
+        toolbarTemplate(){
+            const html = "<button type='button' class='k-button' id='printGrid' @click='printGrid' ref='print'>Print</button>"
+            return kendo.template(html)
+        },
+        contextOpen(event) {
+            const wrapper = this.$refs.grid.kendoWidget()
+            const data = wrapper.dataItem(event.target)
+            this.selectedID = data
+        },
          sortChangeHandler: function(e) {
             this.sort = e.sort;
         },
@@ -196,7 +237,7 @@ export default {
           var thead = gridHeader.find('thead').clone().addClass('k-grid-header');
           printableContent = gridElement
             .clone()
-            .children('.k-grid-header')
+            .children('.k-grid-header').remove()
             .end()
             .children('.k-grid-content')
             .find('table')
